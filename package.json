@@ -1,13 +1,34 @@
 {
-  "name": "@mos/stock-flow",
+  "name": "@jsagir/mos-stock-flow-mcp",
   "version": "0.1.0",
   "private": false,
   "description": "Free `/m:os` stock-and-flow modeling over MCP and CLI",
   "license": "MIT",
   "type": "module",
   "bin": {
-    "mos-flow": "dist/cli.js"
+    "mos-flow": "dist/cli.js",
+    "mos-mcp": "dist/mcp.js"
   },
+  "files": [
+    "dist/**",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jsagir/mos-stock-flow-mcp.git"
+  },
+  "homepage": "https://github.com/jsagir/mos-stock-flow-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/jsagir/mos-stock-flow-mcp/issues"
+  },
+  "keywords": [
+    "mcp",
+    "systems-thinking",
+    "stock-and-flow",
+    "causal-loop",
+    "wicked-problems"
+  ],
   "engines": {
     "node": ">=20"
   },
@@ -26,8 +47,8 @@
     "smoke:all": "npm run smoke:cli && npm run smoke:mcp && npm run smoke:deploy"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.32.1",
     "@modelcontextprotocol/ext-apps": "2.0.3",
+    "@modelcontextprotocol/sdk": "1.32.1",
     "zod": "4.6.7"
   },
   "devDependencies": {

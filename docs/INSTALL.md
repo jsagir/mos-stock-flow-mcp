@@ -12,4 +12,12 @@ For the shared service, add `https://mos-stock-flow-mcp.vercel.app/mcp` in your 
 
 To operate a separate instance in your own account, use the [Render one-click deploy](https://render.com/deploy?repo=https://github.com/jsagir/mos-stock-flow-mcp). Once it is ready, connect its `/mcp` URL. Client setup screens differ, so there is no universal client-side command.
 
-For the CLI, install straight from GitHub with `npm install --global github:jsagir/mos-stock-flow-mcp`. A registry package may be added separately in a future release.
+## npm install
+
+Install both the CLI and local stdio MCP launcher:
+
+```sh
+npm install --global @jsagir/mos-stock-flow-mcp
+```
+
+Use `mos-flow` for CLI commands and `mos-mcp` as the command for a local MCP server configuration. The hosted service above requires no npm install.

@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
-const transport = new StdioClientTransport({ command: process.execPath, args: ["dist/server/stdio.js"] });
+const transport = new StdioClientTransport({ command: process.execPath, args: ["dist/mcp.js"] });
 const client = new Client({ name: "mos-smoke", version: "0.1.0" }, { capabilities: {} });
 await client.connect(transport);
 const tools = await client.listTools(); const required = ["model_create", "model_update", "model_validate", "model_get", "model_export"];
