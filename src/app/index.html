@@ -1,0 +1,57 @@
+<!doctype html>
+<html data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; font-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+    <title>/m:os | Stock and flow mapper</title>
+  </head>
+  <body>
+    <style>__MOS_FONTS__ __MOS_CSS__</style>
+    <header>
+      <div class="brand"><span class="service">/m:os</span><span class="descriptor">STOCK AND FLOW MAPPER</span></div>
+    </header>
+    <main>
+      <section class="intro">
+        <p class="eyebrow">SYSTEMS THINKING / DIAGNOSTIC MAP</p>
+        <h1>See what<br><em>moves the system.</em></h1>
+        <p>Map accumulations, rates, causal hypotheses, delays, and unknowns. The model stays with you.</p>
+      </section>
+      <section class="workspace">
+        <div class="tools" aria-label="Model controls">
+          <label>MODEL TITLE<input id="title" value="Untitled system"></label>
+          <label>SYSTEM BOUNDARY<input id="boundary" value="What is inside this system?"></label>
+          <label>Purpose<input id="purpose" value="What question should this map help explore?"></label>
+          <div class="buttons">
+            <button id="add-stock">+ STOCK</button><button id="add-flow">+ FLOW</button><button id="add-link">+ CAUSAL LINK</button><button id="validate">VALIDATE</button><button id="export">EXPORT JSON</button>
+          </div>
+          <label>IMPORT / EDIT MODEL JSON<textarea id="json" rows="8" spellcheck="false"></textarea></label>
+          <p id="status" role="status" aria-live="polite">Draft model. Unknown values stay unknown.</p>
+          <section class="semantic-key" aria-label="Color meanings">
+            <h2>Reading the marks</h2>
+            <p><span class="key blue">BLUE</span> Inquiry and evidence attention</p>
+            <p><span class="key red">RED</span> Assumption under challenge or interruption</p>
+            <p><span class="key yellow">YELLOW</span> Possibility, tension, or reframe</p>
+          </section>
+        </div>
+        <div class="map-wrap">
+          <svg id="map" viewBox="0 0 1000 580" role="img" aria-label="Interactive stock and flow system diagram" aria-describedby="flow-summary relationship-summary">
+            <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="var(--ink)"/></marker></defs>
+          </svg>
+          <p class="legend"><b>■ STOCK</b> accumulation <b>→ FLOW</b> material transfer <b>+ / − / ? CAUSAL LINK</b> influence. Line pattern and label give evidence status.</p>
+          <h2>Material flows in text</h2>
+          <p id="flow-summary" role="status" aria-live="polite"></p>
+          <ul id="material-flows" class="causal-summary" aria-label="Material flows"></ul>
+          <h2>Relationships in text</h2>
+          <p id="relationship-summary" role="status" aria-live="polite"></p>
+          <ul id="relationships" class="causal-summary" aria-label="Causal relationships"></ul>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <span>Service: /m:os stock and flow mapper</span>
+      <span class="endorsement"><img alt="Mindrian OS" src="__PARENT_LOCKUP__"><span>PART OF THE MINDRIAN FAMILY</span></span>
+    </footer>
+    <script>__MOS_SCRIPT__</script>
+  </body>
+</html>

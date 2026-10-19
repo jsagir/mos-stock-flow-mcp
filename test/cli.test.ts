@@ -1,0 +1,5 @@
+import { describe, expect, it } from "vitest";
+import { fixture } from "../src/core/fixture.js";
+import { renderSvg } from "../src/cli/commands.js";
+describe("CLI export renderer", () => { it("escapes labels and keeps flows apart from causal links", () => { const model = { ...fixture, title: "<Garden>" }; const html = renderSvg(model); expect(html).toContain("&lt;Garden&gt;"); expect(html).toContain("People joining"); expect(html).toContain("outside"); expect(html).toContain("+ · hypothesis · Care may increase usable beds"); }); });
+describe("family-branded standalone export", () => { it("embeds family tokens, fonts and the exact parent mark without external requests", () => { const html = renderSvg(fixture); for (const value of ["#F7F5EE", "#1F3FBF", "#D6281F", "#F2C200", "data:image/svg+xml;base64,", "data:font/woff2;base64,", "data:font/ttf;base64,"]) expect(html).toContain(value); expect(html).not.toContain("https://"); expect(html).not.toContain(String.fromCharCode(0x2014)); }); });

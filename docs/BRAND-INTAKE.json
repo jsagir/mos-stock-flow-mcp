@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "consumer": {
+    "id": "mos-stock-flow-mcp",
+    "name": "/m:os stock and flow mapper",
+    "kind": "service",
+    "team": "MindrianOS",
+    "project": "mos-stock-flow-mcp",
+    "owner": "Project owner"
+  },
+  "what": {
+    "deliverable": "Free standalone /m:os stock and flow mapper with CLI, MCP server, and MCP Apps view",
+    "surfaces": ["mcp-tool", "service", "app-ui", "documentation"],
+    "languages": ["en"],
+    "familyMember": null
+  },
+  "how": {
+    "approach": "Adopt the mos-brand consumer intake contract as a local workflow record. Apply the selected family architecture, color, typography, identity, and documentation guidance; record product-specific decisions and their source SHAs in docs/BRAND.md. This is a consumer-side record, not a source-repository intake result.",
+    "workflowFile": "docs/BRAND.md",
+    "steps": [
+      { "phase": "brief", "action": "Confirm /m:os service naming and distinguish the mapper presentation from the parent family lockup." },
+      { "phase": "produce", "action": "Use the exact family palette, bundled type assets, inline SVG, and semantic color and evidence labels." },
+      { "phase": "review", "action": "Check the app, exported UI, accessibility text, and parent logo asset against the recorded source segments." },
+      { "phase": "return-learning", "action": "Record limits and proposed product-family status locally; no source mos-brand repo edits were made." }
+    ]
+  },
+  "why": {
+    "purpose": "Give practitioners and students a free, portable way to make system stocks, flows, causal links, evidence status, delays, and unknowns visible.",
+    "evidence": "The deliverable is scoped by this project plan and reviewed against the connected mos-brand source segments listed in docs/BRAND.md.",
+    "success": "The CLI, MCP, and MCP Apps view use the same model; the service is identifiable as /m:os; visual evidence status remains labeled and accessible; no source data is silently asserted."
+  },
+  "jtbd": {
+    "when": "A practitioner or student needs to inspect a complex or contested system with an AI client that supports MCP or a local command line.",
+    "want": "I want to express the system context as stocks, flows, causal relationships, delays, assumptions, and unknowns, then see an editable visual map.",
+    "so": "I can discuss boundaries and leverage hypotheses while keeping evidence and uncertainty visible."
+  }
+}

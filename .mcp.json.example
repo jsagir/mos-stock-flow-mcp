@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mos-systems": {
+      "command": "node",
+      "args": ["/absolute/path/to/mos-stock-flow-mcp/dist/server/stdio.js"]
+    }
+  }
+}

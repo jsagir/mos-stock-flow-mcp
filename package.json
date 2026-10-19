@@ -1,0 +1,40 @@
+{
+  "name": "@mos/stock-flow",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Free `/m:os` stock-and-flow modeling over MCP and CLI",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "mos-flow": "dist/cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "tsc && node scripts/copy-app.mjs",
+    "prepare": "npm run build",
+    "start": "node dist/server/http.js",
+    "mcp:stdio": "node dist/server/stdio.js",
+    "smoke:cli": "node scripts/smoke-cli.mjs",
+    "smoke:mcp": "node scripts/smoke-mcp.mjs",
+    "test:app": "vitest run test/app.test.ts",
+    "check:docs": "node scripts/check-docs.mjs",
+    "smoke:deploy": "node scripts/smoke-deploy.mjs",
+    "smoke:all": "npm run smoke:cli && npm run smoke:mcp && npm run smoke:deploy"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "@modelcontextprotocol/ext-apps": "2.0.3",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "esbuild": "0.25.12",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  },
+  "author": "/m:os contributors"
+}

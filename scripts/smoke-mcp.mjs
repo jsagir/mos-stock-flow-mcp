@@ -1,0 +1,13 @@
+import { spawn } from "node:child_process";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+const transport = new StdioClientTransport({ command: process.execPath, args: ["dist/server/stdio.js"] });
+const client = new Client({ name: "mos-smoke", version: "0.1.0" }, { capabilities: {} });
+await client.connect(transport);
+const tools = await client.listTools(); const required = ["model_create", "model_update", "model_validate", "model_get", "model_export"];
+for (const name of required) if (!tools.tools.some(t => t.name === name)) throw new Error(`Missing MCP tool ${name}`);
+const model = JSON.parse((await import("../dist/core/fixture.js")).fixture ? JSON.stringify((await import("../dist/core/fixture.js")).fixture) : "{}");
+const res = await client.callTool({ name: "model_validate", arguments: { model: JSON.stringify(model) } });
+if (res.isError || !JSON.stringify(res).includes("Valid")) throw new Error(JSON.stringify(res));
+await client.close();
+process.stdout.write("MCP smoke passed: stdio initialize/list-tools/validate.\n");
