@@ -34,14 +34,22 @@ h1 em { color: var(--blue); font-style: normal; }
 .tools label { display: grid; gap: 5px; font: 600 10px/1.45 var(--code); text-transform: uppercase; }
 .tools input, .tools textarea { width: 100%; padding: 9px; font: 14px/1.45 var(--body); text-transform: none; }
 .buttons { display: flex; flex-wrap: wrap; gap: 8px; }
-.map-wrap svg { display: block; width: 100%; min-height: 390px; border: 1px solid var(--quiet); background: var(--white); }
-svg .causal, svg .material { fill: none; stroke-width: 2; }
-svg .causal.evidenced, svg .material.evidenced { stroke: var(--blue); }
-svg .causal.inferred, svg .material.inferred { stroke: var(--blue); stroke-dasharray: 10 4 2 4; }
-svg .causal.proposed, svg .material.proposed { stroke: var(--soft); stroke-dasharray: 8 5; }
-svg .causal.unknown, svg .material.unknown { stroke: var(--soft); stroke-dasharray: 2 5; }
-.label { fill: var(--ink); font: 700 17px var(--body); }
-.type, .polarity, .flow { fill: var(--soft); font: 600 11px var(--code); }
+.map-wrap svg { display: block; width: 100%; height: auto; min-width: 780px; border: 1px solid #aaa; background: #fff; font: 14px Arial, sans-serif; }
+svg .stock rect, svg .aux ellipse { fill: #fff; stroke: #171717; stroke-width: 2; }
+svg .node-label { fill: #171717; font: 600 16px Arial, sans-serif; }
+svg .node-meta, svg .node-kind { fill: #444; font: 12px Arial, sans-serif; }
+svg .flow .pipe-under { fill: none; stroke: #fff; stroke-width: 10; }
+svg .flow .pipe { fill: none; stroke: #171717; stroke-width: 2; marker-end: url(#flow-arrow); }
+svg .flow .valve { fill: #fff; stroke: #171717; stroke-width: 2; }
+svg .flow .valve-mark { fill: none; stroke: #171717; stroke-width: 1.5; }
+svg .causal path { fill: none; stroke: #444; stroke-width: 1.6; stroke-dasharray: 6 4; marker-end: url(#causal-arrow); }
+svg .polarity-badge { fill: #fff; stroke: #444; stroke-width: 1.2; }
+svg .polarity { fill: #171717; font: bold 14px Arial, sans-serif; }
+svg .clouds path { fill: #fff; stroke: #171717; stroke-width: 1.5; }
+svg .flow-label, svg .link-label { fill: #171717; font: 13px Arial, sans-serif; }
+svg .flow.inferred .pipe, svg .causal.inferred path { stroke-dasharray: 8 3 2 3; }
+svg .flow.hypothesis .pipe, svg .causal.hypothesis path { stroke-dasharray: 7 4; }
+svg .flow.unknown .pipe, svg .causal.unknown path { stroke-dasharray: 2 4; }
 .legend { color: var(--soft); font-size: 12px; }
 #status { padding: 10px; border-inline-start: 3px solid var(--blue); background: var(--white); font-size: 12px; }
 .semantic-key { padding: 8px 10px; background: var(--quiet); font-size: 12px; }
@@ -60,7 +68,7 @@ footer { display: flex; justify-content: space-between; align-items: center; gap
 @media (max-width: 900px) {
   .workspace { grid-template-columns: 1fr; }
   .map-wrap { padding: 12px; }
-  .map-wrap svg { min-height: 300px; }
+  .map-wrap svg { min-width: 780px; }
   footer { align-items: flex-start; flex-direction: column; }
 }
 @media (prefers-reduced-motion: reduce) {

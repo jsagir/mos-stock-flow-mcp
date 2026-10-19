@@ -27,18 +27,12 @@
           </div>
           <label>IMPORT / EDIT MODEL JSON<textarea id="json" rows="8" spellcheck="false"></textarea></label>
           <p id="status" role="status" aria-live="polite">Draft model. Unknown values stay unknown.</p>
-          <section class="semantic-key" aria-label="Color meanings">
-            <h2>Reading the marks</h2>
-            <p><span class="key blue">BLUE</span> Inquiry and evidence attention</p>
-            <p><span class="key red">RED</span> Assumption under challenge or interruption</p>
-            <p><span class="key yellow">YELLOW</span> Possibility, tension, or reframe</p>
-          </section>
         </div>
         <div class="map-wrap">
           <svg id="map" viewBox="0 0 1000 580" role="img" aria-label="Interactive stock and flow system diagram" aria-describedby="flow-summary relationship-summary">
             <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="var(--ink)"/></marker></defs>
           </svg>
-          <p class="legend"><b>■ STOCK</b> accumulation <b>→ FLOW</b> material transfer <b>+ / − / ? CAUSAL LINK</b> influence. Line pattern and label give evidence status.</p>
+          <p class="legend"><b>Rectangle</b> stock (accumulation) · <b>pipe and valve</b> material flow · <b>dashed arrow</b> causal influence · <b>+ / − / ?</b> polarity. Line pattern indicates evidence status.</p>
           <h2>Material flows in text</h2>
           <p id="flow-summary" role="status" aria-live="polite"></p>
           <ul id="material-flows" class="causal-summary" aria-label="Material flows"></ul>

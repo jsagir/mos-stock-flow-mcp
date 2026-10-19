@@ -43,14 +43,22 @@ h1 em { color: var(--blue); font-style: normal; }
 .tools label { display: grid; gap: 5px; font: 600 10px/1.45 var(--code); text-transform: uppercase; }
 .tools input, .tools textarea { width: 100%; padding: 9px; font: 14px/1.45 var(--body); text-transform: none; }
 .buttons { display: flex; flex-wrap: wrap; gap: 8px; }
-.map-wrap svg { display: block; width: 100%; min-height: 390px; border: 1px solid var(--quiet); background: var(--white); }
-svg .causal, svg .material { fill: none; stroke-width: 2; }
-svg .causal.evidenced, svg .material.evidenced { stroke: var(--blue); }
-svg .causal.inferred, svg .material.inferred { stroke: var(--blue); stroke-dasharray: 10 4 2 4; }
-svg .causal.proposed, svg .material.proposed { stroke: var(--soft); stroke-dasharray: 8 5; }
-svg .causal.unknown, svg .material.unknown { stroke: var(--soft); stroke-dasharray: 2 5; }
-.label { fill: var(--ink); font: 700 17px var(--body); }
-.type, .polarity, .flow { fill: var(--soft); font: 600 11px var(--code); }
+.map-wrap svg { display: block; width: 100%; height: auto; min-width: 780px; border: 1px solid #aaa; background: #fff; font: 14px Arial, sans-serif; }
+svg .stock rect, svg .aux ellipse { fill: #fff; stroke: #171717; stroke-width: 2; }
+svg .node-label { fill: #171717; font: 600 16px Arial, sans-serif; }
+svg .node-meta, svg .node-kind { fill: #444; font: 12px Arial, sans-serif; }
+svg .flow .pipe-under { fill: none; stroke: #fff; stroke-width: 10; }
+svg .flow .pipe { fill: none; stroke: #171717; stroke-width: 2; marker-end: url(#flow-arrow); }
+svg .flow .valve { fill: #fff; stroke: #171717; stroke-width: 2; }
+svg .flow .valve-mark { fill: none; stroke: #171717; stroke-width: 1.5; }
+svg .causal path { fill: none; stroke: #444; stroke-width: 1.6; stroke-dasharray: 6 4; marker-end: url(#causal-arrow); }
+svg .polarity-badge { fill: #fff; stroke: #444; stroke-width: 1.2; }
+svg .polarity { fill: #171717; font: bold 14px Arial, sans-serif; }
+svg .clouds path { fill: #fff; stroke: #171717; stroke-width: 1.5; }
+svg .flow-label, svg .link-label { fill: #171717; font: 13px Arial, sans-serif; }
+svg .flow.inferred .pipe, svg .causal.inferred path { stroke-dasharray: 8 3 2 3; }
+svg .flow.hypothesis .pipe, svg .causal.hypothesis path { stroke-dasharray: 7 4; }
+svg .flow.unknown .pipe, svg .causal.unknown path { stroke-dasharray: 2 4; }
 .legend { color: var(--soft); font-size: 12px; }
 #status { padding: 10px; border-inline-start: 3px solid var(--blue); background: var(--white); font-size: 12px; }
 .semantic-key { padding: 8px 10px; background: var(--quiet); font-size: 12px; }
@@ -69,7 +77,7 @@ footer { display: flex; justify-content: space-between; align-items: center; gap
 @media (max-width: 900px) {
   .workspace { grid-template-columns: 1fr; }
   .map-wrap { padding: 12px; }
-  .map-wrap svg { min-height: 300px; }
+  .map-wrap svg { min-width: 780px; }
   footer { align-items: flex-start; flex-direction: column; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -95,18 +103,12 @@ footer { display: flex; justify-content: space-between; align-items: center; gap
           </div>
           <label>IMPORT / EDIT MODEL JSON<textarea id="json" rows="8" spellcheck="false"></textarea></label>
           <p id="status" role="status" aria-live="polite">Draft model. Unknown values stay unknown.</p>
-          <section class="semantic-key" aria-label="Color meanings">
-            <h2>Reading the marks</h2>
-            <p><span class="key blue">BLUE</span> Inquiry and evidence attention</p>
-            <p><span class="key red">RED</span> Assumption under challenge or interruption</p>
-            <p><span class="key yellow">YELLOW</span> Possibility, tension, or reframe</p>
-          </section>
         </div>
         <div class="map-wrap">
           <svg id="map" viewBox="0 0 1000 580" role="img" aria-label="Interactive stock and flow system diagram" aria-describedby="flow-summary relationship-summary">
             <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="var(--ink)"/></marker></defs>
           </svg>
-          <p class="legend"><b>■ STOCK</b> accumulation <b>→ FLOW</b> material transfer <b>+ / − / ? CAUSAL LINK</b> influence. Line pattern and label give evidence status.</p>
+          <p class="legend"><b>Rectangle</b> stock (accumulation) · <b>pipe and valve</b> material flow · <b>dashed arrow</b> causal influence · <b>+ / − / ?</b> polarity. Line pattern indicates evidence status.</p>
           <h2>Material flows in text</h2>
           <p id="flow-summary" role="status" aria-live="polite"></p>
           <ul id="material-flows" class="causal-summary" aria-label="Material flows"></ul>
@@ -25955,45 +25957,60 @@ container holding the app. Specify either width or maxWidth, and either height o
     return issues.length ? { ok: false, issues } : { ok: true, model: model2 };
   }
 
+  // src/core/diagram.ts
+  var esc2 = (s) => s.replace(/[&<>"']/g, (c2) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c2]);
+  var evidenceClass = (e) => e === "observed" || e === "reported" ? "solid" : e === "inferred" ? "inferred" : e === "hypothesis" ? "hypothesis" : "unknown";
+  function renderDiagram(model2) {
+    const all = [...model2.stocks, ...model2.actors, ...model2.levels];
+    const points = new Map(all.map((n, i2) => [n.id, model2.layout.nodes[n.id] ?? { x: 100 + i2 % 3 * 340, y: 100 + Math.floor(i2 / 3) * 240 }]));
+    const size = (id2) => model2.stocks.some((s) => s.id === id2) ? { w: 220, h: 94 } : { w: 190, h: 72 };
+    const p2 = (id2) => points.get(id2) ?? { x: 100, y: 100 };
+    const minX = Math.min(0, ...all.map((n) => p2(n.id).x - 220));
+    const minY = Math.min(0, ...all.map((n) => p2(n.id).y - 80));
+    const maxX = Math.max(900, ...all.map((n) => p2(n.id).x + size(n.id).w + 180));
+    const maxY = Math.max(520, ...all.map((n) => p2(n.id).y + size(n.id).h + 150));
+    const nodes = all.map((n) => {
+      const q2 = p2(n.id), stock2 = model2.stocks.find((s) => s.id === n.id), kind = stock2 ? "STOCK" : model2.actors.some((a2) => a2.id === n.id) ? "ACTOR" : "LEVEL";
+      const w2 = size(n.id).w, h2 = size(n.id).h;
+      if (stock2) return `<g class="stock"><rect x="${q2.x}" y="${q2.y}" width="${w2}" height="${h2}"/><text class="node-label" x="${q2.x + 12}" y="${q2.y + 32}">${esc2(n.label)}</text><text class="node-meta" x="${q2.x + 12}" y="${q2.y + 66}">${esc2([stock2.value ?? "", stock2.unit ?? ""].filter(Boolean).join(" ") || "value unknown")}</text></g>`;
+      return `<g class="aux"><ellipse cx="${q2.x + w2 / 2}" cy="${q2.y + h2 / 2}" rx="${w2 / 2}" ry="${h2 / 2}"/><text class="node-kind" x="${q2.x + w2 / 2}" y="${q2.y + 25}" text-anchor="middle">${kind}</text><text class="node-label" x="${q2.x + w2 / 2}" y="${q2.y + 48}" text-anchor="middle">${esc2(n.label)}</text></g>`;
+    }).join("");
+    const clouds = /* @__PURE__ */ new Set();
+    const flows = model2.flows.map((f2, i2) => {
+      const from = f2.fromStockId ? p2(f2.fromStockId) : null, to = f2.toStockId ? p2(f2.toStockId) : null;
+      const fromSize = f2.fromStockId ? size(f2.fromStockId) : null, toSize = f2.toStockId ? size(f2.toStockId) : null;
+      const y1 = from ? from.y + fromSize.h / 2 : (to?.y ?? 100) + 30 + i2 % 3 * 16;
+      const y2 = to ? to.y + toSize.h / 2 : y1;
+      const rightward = !from || !to || to.x >= from.x;
+      const sx = from ? from.x + (rightward ? fromSize.w : 0) : (to?.x ?? 260) - 140;
+      const ex = to ? to.x + (rightward ? 0 : toSize.w) : (from?.x ?? 100) + fromSize.w + 140;
+      const d2 = `M${sx},${y1} H${(sx + ex) / 2} V${y2} H${ex}`;
+      if (!from) clouds.add(`M${sx - 35},${y1} c-18,-16 8,-33 23,-24 c9,-24 42,-12 38,7 c22,3 17,28 -2,28 h-44 c-10,0 -17,-5 -15,-11 Z`);
+      if (!to) clouds.add(`M${ex - 18},${y2} c-18,-16 8,-33 23,-24 c9,-24 42,-12 38,7 c22,3 17,28 -2,28 h-44 c-10,0 -17,-5 -15,-11 Z`);
+      const mid = (sx + ex) / 2;
+      return `<g class="flow ${evidenceClass(f2.evidence)}"><path d="${d2}" class="pipe-under"/><path d="${d2}" class="pipe" marker-end="url(#flow-arrow)"/><circle class="valve" cx="${mid}" cy="${y1}" r="12"/><path class="valve-mark" d="M${mid - 7},${y1 - 7} L${mid},${y1} L${mid - 7},${y1 + 7} M${mid + 7},${y1 - 7} L${mid},${y1} L${mid + 7},${y1 + 7}"/><text class="flow-label" x="${mid}" y="${Math.min(y1, y2) - 16}" text-anchor="middle">${esc2(f2.label)}${f2.rate != null ? ` \xB7 ${esc2(String(f2.rate))}` : ""}${f2.unit ? ` ${esc2(f2.unit)}` : ""}</text></g>`;
+    }).join("");
+    const links = model2.causalLinks.map((link) => {
+      const a2 = p2(link.fromId), b2 = p2(link.toId), as = size(link.fromId), bs = size(link.toId);
+      const x1 = a2.x + as.w / 2, y1 = a2.y, x2 = b2.x + bs.w / 2, y2 = b2.y;
+      const lift = Math.max(48, Math.abs(x2 - x1) * 0.18), mx = (x1 + x2) / 2, my = Math.min(y1, y2) - lift;
+      const pol = link.polarity === "positive" ? "+" : link.polarity === "negative" ? "\u2212" : "?";
+      return `<g class="causal ${evidenceClass(link.evidence)}"><path d="M${x1},${y1} Q${mx},${my} ${x2},${y2}" marker-end="url(#causal-arrow)"/><circle cx="${mx}" cy="${my}" r="12" class="polarity-badge"/><text x="${mx}" y="${my + 5}" text-anchor="middle" class="polarity">${pol}</text>${link.label ? `<text x="${mx}" y="${my - 15}" text-anchor="middle" class="link-label">${esc2(link.label)}</text>` : ""}</g>`;
+    }).join("");
+    return { viewBox: `${minX} ${minY} ${maxX - minX} ${maxY - minY}`, width: maxX - minX, height: maxY - minY, markup: `<defs><marker id="flow-arrow" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0L9 4L0 8Z"/></marker><marker id="causal-arrow" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0L9 4L0 8Z"/></marker></defs><g class="clouds">${[...clouds].map((d2) => `<path d="${d2}"/>`).join("")}</g>${flows}${links}${nodes}` };
+  }
+
   // src/app/main.ts
   var app = new l({ name: "/m:os systems canvas", version: "0.1.0" });
   var model = structuredClone(fixture);
   var hostConnected = false;
   var byId = (id2) => document.getElementById(id2);
-  var esc2 = (s) => s.replace(/[&<>"']/g, (c2) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c2]);
   function redraw() {
     const svg = byId("map");
-    const defs = svg.querySelector("defs")?.outerHTML ?? "";
+    const diagram = renderDiagram(model);
+    svg.setAttribute("viewBox", diagram.viewBox);
+    svg.innerHTML = diagram.markup;
     const ns = [...model.stocks, ...model.actors, ...model.levels];
-    const position = (id2, fallbackIndex) => model.layout.nodes[id2] ?? { x: 90 + fallbackIndex % 3 * 300, y: 100 + Math.floor(fallbackIndex / 3) * 180 };
-    const nodeIndex = new Map(ns.map((node2, index) => [node2.id, index]));
-    const pattern = (evidence) => evidence === "observed" || evidence === "reported" ? "evidenced" : evidence === "inferred" ? "inferred" : evidence === "hypothesis" ? "proposed" : "unknown";
-    const nodes = ns.map((n, i2) => {
-      const p2 = position(n.id, i2);
-      const stock2 = model.stocks.some((s) => s.id === n.id);
-      const actor2 = model.actors.some((a2) => a2.id === n.id);
-      const kind = stock2 ? "STOCK / ACCUMULATION" : actor2 ? "ACTOR" : "NESTED LEVEL";
-      return `<g><rect x="${p2.x}" y="${p2.y}" width="220" height="88" fill="var(--white)" stroke="var(--ink)"/><text x="${p2.x + 14}" y="${p2.y + 30}" class="type">${kind}</text><text x="${p2.x + 14}" y="${p2.y + 58}" class="label">${esc2(n.label)}</text></g>`;
-    }).join("");
-    const flows = model.flows.map((flow2, i2) => {
-      const laneY = 355 + i2 * 32;
-      const from = flow2.fromStockId ? position(flow2.fromStockId, nodeIndex.get(flow2.fromStockId) ?? 0) : { x: 24, y: laneY };
-      const to = flow2.toStockId ? position(flow2.toStockId, nodeIndex.get(flow2.toStockId) ?? 0) : { x: 970, y: laneY };
-      const startX = flow2.fromStockId ? from.x + 220 : from.x;
-      const startY = flow2.fromStockId ? from.y + 44 : laneY;
-      const endX = flow2.toStockId ? to.x : to.x;
-      const endY = flow2.toStockId ? to.y + 44 : laneY;
-      const path = `M${startX},${startY} L${startX},${laneY} L${endX},${laneY} L${endX},${endY}`;
-      const source = flow2.fromStockId ? model.stocks.find((stock2) => stock2.id === flow2.fromStockId)?.label ?? flow2.fromStockId : "outside";
-      const destination = flow2.toStockId ? model.stocks.find((stock2) => stock2.id === flow2.toStockId)?.label ?? flow2.toStockId : "outside";
-      const label2 = `${flow2.label} \xB7 ${source} \u2192 ${destination} \xB7 ${flow2.evidence} \xB7 ${flow2.unit ?? "rate unknown"}`;
-      return `<path d="${path}" class="material ${pattern(flow2.evidence)}" marker-end="url(#arrow)"/><text x="28" y="${laneY - 8}" class="flow">${esc2(label2)}</text>`;
-    }).join("");
-    const links = model.causalLinks.map((link) => {
-      const a2 = position(link.fromId, nodeIndex.get(link.fromId) ?? 0), b2 = position(link.toId, nodeIndex.get(link.toId) ?? 0);
-      return `<path d="M${a2.x + 220},${a2.y + 44} L${b2.x},${b2.y + 44}" class="causal ${pattern(link.evidence)}" marker-end="url(#arrow)"/><text x="${a2.x + 230}" y="${a2.y + 30}" class="polarity">${link.polarity === "positive" ? "+" : link.polarity === "negative" ? "\u2212" : "?"} \xB7 ${esc2(link.evidence)} \xB7 ${esc2(link.label ?? "influence")}</text>`;
-    }).join("");
-    svg.innerHTML = defs + flows + links + nodes;
     const materialFlows = byId("material-flows");
     materialFlows.replaceChildren(...model.flows.map((flow2) => {
       const source = flow2.fromStockId ? model.stocks.find((stock2) => stock2.id === flow2.fromStockId)?.label ?? flow2.fromStockId : "outside";

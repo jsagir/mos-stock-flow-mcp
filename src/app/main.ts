@@ -3,31 +3,15 @@ import { PostMessageTransport } from "@modelcontextprotocol/ext-apps";
 import { fixture } from "../core/fixture.js";
 import { validateModel } from "../core/validate.js";
 import type { Model } from "../core/model.js";
+import { renderDiagram } from "../core/diagram.js";
 const app = new App({ name: "/m:os systems canvas", version: "0.1.0" });
 let model: Model = structuredClone(fixture);
 let hostConnected = false;
 const byId = <T extends Element>(id: string) => document.getElementById(id) as unknown as T;
 const esc = (s: string) => s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 function redraw() {
-  const svg = byId<SVGSVGElement>("map"); const defs = svg.querySelector("defs")?.outerHTML ?? ""; const ns = [...model.stocks, ...model.actors, ...model.levels];
-  const position = (id: string, fallbackIndex: number) => model.layout.nodes[id] ?? { x: 90 + (fallbackIndex % 3) * 300, y: 100 + Math.floor(fallbackIndex / 3) * 180 };
-  const nodeIndex = new Map(ns.map((node, index) => [node.id, index]));
-  const pattern = (evidence: string) => evidence === "observed" || evidence === "reported" ? "evidenced" : evidence === "inferred" ? "inferred" : evidence === "hypothesis" ? "proposed" : "unknown";
-  const nodes = ns.map((n, i) => { const p = position(n.id, i); const stock = model.stocks.some(s => s.id === n.id); const actor = model.actors.some(a => a.id === n.id); const kind = stock ? "STOCK / ACCUMULATION" : actor ? "ACTOR" : "NESTED LEVEL"; return `<g><rect x="${p.x}" y="${p.y}" width="220" height="88" fill="var(--white)" stroke="var(--ink)"/><text x="${p.x + 14}" y="${p.y + 30}" class="type">${kind}</text><text x="${p.x + 14}" y="${p.y + 58}" class="label">${esc(n.label)}</text></g>`; }).join("");
-  const flows = model.flows.map((flow, i) => {
-    const laneY = 355 + i * 32;
-    const from = flow.fromStockId ? position(flow.fromStockId, nodeIndex.get(flow.fromStockId) ?? 0) : { x: 24, y: laneY };
-    const to = flow.toStockId ? position(flow.toStockId, nodeIndex.get(flow.toStockId) ?? 0) : { x: 970, y: laneY };
-    const startX = flow.fromStockId ? from.x + 220 : from.x; const startY = flow.fromStockId ? from.y + 44 : laneY;
-    const endX = flow.toStockId ? to.x : to.x; const endY = flow.toStockId ? to.y + 44 : laneY;
-    const path = `M${startX},${startY} L${startX},${laneY} L${endX},${laneY} L${endX},${endY}`;
-    const source = flow.fromStockId ? (model.stocks.find(stock => stock.id === flow.fromStockId)?.label ?? flow.fromStockId) : "outside";
-    const destination = flow.toStockId ? (model.stocks.find(stock => stock.id === flow.toStockId)?.label ?? flow.toStockId) : "outside";
-    const label = `${flow.label} · ${source} → ${destination} · ${flow.evidence} · ${flow.unit ?? "rate unknown"}`;
-    return `<path d="${path}" class="material ${pattern(flow.evidence)}" marker-end="url(#arrow)"/><text x="28" y="${laneY - 8}" class="flow">${esc(label)}</text>`;
-  }).join("");
-  const links = model.causalLinks.map(link => { const a = position(link.fromId, nodeIndex.get(link.fromId) ?? 0), b = position(link.toId, nodeIndex.get(link.toId) ?? 0); return `<path d="M${a.x + 220},${a.y + 44} L${b.x},${b.y + 44}" class="causal ${pattern(link.evidence)}" marker-end="url(#arrow)"/><text x="${a.x + 230}" y="${a.y + 30}" class="polarity">${link.polarity === "positive" ? "+" : link.polarity === "negative" ? "−" : "?"} · ${esc(link.evidence)} · ${esc(link.label ?? "influence")}</text>`; }).join("");
-  svg.innerHTML = defs + flows + links + nodes;
+  const svg = byId<SVGSVGElement>("map"); const diagram = renderDiagram(model); svg.setAttribute("viewBox", diagram.viewBox); svg.innerHTML = diagram.markup;
+  const ns = [...model.stocks, ...model.actors, ...model.levels];
   const materialFlows = byId<HTMLUListElement>("material-flows");
   materialFlows.replaceChildren(...model.flows.map(flow => {
     const source = flow.fromStockId ? (model.stocks.find(stock => stock.id === flow.fromStockId)?.label ?? flow.fromStockId) : "outside";
