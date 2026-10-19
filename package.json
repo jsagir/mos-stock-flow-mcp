@@ -36,7 +36,6 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "build": "tsc && node scripts/copy-app.mjs",
-    "prepare": "npm run build",
     "start": "node dist/server/http.js",
     "mcp:stdio": "node dist/server/stdio.js",
     "smoke:cli": "node scripts/smoke-cli.mjs",

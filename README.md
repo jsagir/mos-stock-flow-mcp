@@ -6,16 +6,16 @@ Free, standalone system mapping through one versioned JSON model, a CLI, an MCP 
 
 Connect your MCP client to **https://mos-stock-flow-mcp.vercel.app/mcp**. This is the shared `/m:os` service; users do not need to deploy it. It uses stateless Streamable HTTP and does not save or log submitted model content. See the [service page](https://mos-stock-flow-mcp.vercel.app/) and [host connection guide](docs/INSTALL.md).
 
-## Install CLI and local MCP from npm
+## Install CLI and local MCP
 
-Install the published package:
+Install directly from GitHub with npm:
 
 ```sh
-npm install --global @jsagir/mos-stock-flow-mcp
+npm install --global github:jsagir/mos-stock-flow-mcp
 mos-flow init -o garden.json
 ```
 
-For a local MCP client, set its server command to `mos-mcp`. To install from source, clone the repository and run `./install.sh`.
+This installs the prebuilt release, so users do not need TypeScript or a local build toolchain. For a local MCP client, set its server command to `mos-mcp`. To install from a source checkout, run `./install.sh`.
 
 ## Local MCP setup
 
