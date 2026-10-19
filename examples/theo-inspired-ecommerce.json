@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "1.0",
+  "id": "lantern-home-commerce-growth",
+  "title": "Lantern Home: an eCommerce growth system",
+  "boundary": "A fictional home-goods shop's path from marketing exposure to first purchase and repeat purchase, including customer word of mouth.",
+  "purpose": "Use a published agency case as a prompt to explore how acquisition, conversion, and repeat buying might reinforce or constrain growth.",
+  "timeHorizon": "Conceptual; stock values and flow rates are not calibrated.",
+  "actors": [],
+  "levels": [],
+  "stocks": [
+    {
+      "id": "familiar-prospects",
+      "label": "People familiar with the shop",
+      "description": "People who recognize the fictional Lantern Home brand and may consider a visit.",
+      "unit": "people",
+      "value": null,
+      "evidence": "unknown"
+    },
+    {
+      "id": "qualified-visitors",
+      "label": "Qualified shop visitors",
+      "description": "Potential buyers currently exploring products in the shop.",
+      "unit": "visits",
+      "value": null,
+      "evidence": "unknown"
+    },
+    {
+      "id": "first-time-customers",
+      "label": "First-time customers",
+      "description": "Customers after their first completed purchase, before a repeat purchase.",
+      "unit": "customers",
+      "value": null,
+      "evidence": "unknown"
+    },
+    {
+      "id": "repeat-customers",
+      "label": "Repeat customers",
+      "description": "Customers who have completed another purchase.",
+      "unit": "customers",
+      "value": null,
+      "evidence": "unknown"
+    }
+  ],
+  "flows": [
+    {
+      "id": "campaign-reach",
+      "label": "Campaign exposure",
+      "toStockId": "familiar-prospects",
+      "unit": "people per period",
+      "rate": null,
+      "evidence": "hypothesis",
+      "delay": "Campaign exposure may take time to become recognizable familiarity."
+    },
+    {
+      "id": "shop-visits",
+      "label": "Familiar people visit",
+      "fromStockId": "familiar-prospects",
+      "toStockId": "qualified-visitors",
+      "unit": "visits per period",
+      "rate": null,
+      "evidence": "hypothesis",
+      "delay": null
+    },
+    {
+      "id": "first-purchases",
+      "label": "First purchases",
+      "fromStockId": "qualified-visitors",
+      "toStockId": "first-time-customers",
+      "unit": "customers per period",
+      "rate": null,
+      "evidence": "hypothesis",
+      "delay": "Product discovery and checkout can create a delay before purchase."
+    },
+    {
+      "id": "repeat-purchases",
+      "label": "Repeat purchase",
+      "fromStockId": "first-time-customers",
+      "toStockId": "repeat-customers",
+      "unit": "customers per period",
+      "rate": null,
+      "evidence": "hypothesis",
+      "delay": "Repeat purchase depends on product use and timing of the next need."
+    },
+    {
+      "id": "customer-inactivity",
+      "label": "Become inactive",
+      "fromStockId": "repeat-customers",
+      "unit": "customers per period",
+      "rate": null,
+      "evidence": "hypothesis",
+      "delay": null
+    }
+  ],
+  "causalLinks": [],
+  "assumptions": [
+    {
+      "id": "fictional-business",
+      "text": "Lantern Home and its operating details are fictional; this is a discussion model, not a reconstruction of Theo's client or campaign.",
+      "status": "observed"
+    },
+    {
+      "id": "case-study-not-calibration",
+      "text": "The published case outcomes are contextual evidence only. They do not determine stock levels, rates, or causal relationships in this model.",
+      "status": "observed"
+    },
+    {
+      "id": "stage-map",
+      "text": "The customer journey is divided into stages to make the case easy to inspect. The model does not include conversion percentages, campaign costs, or people leaving each stage, because the public case summary does not provide those data.",
+      "status": "hypothesis"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "theo-case-outcomes",
+      "text": "Theo Agency's case-study page reports one 2023 eCommerce engagement with +60% eCommerce revenue, +90% first-time buyers, and +152% ROAS. These are reported case outcomes, not time-series data for this model.",
+      "status": "reported"
+    },
+    {
+      "id": "system-structure",
+      "text": "The acquisition-to-repeat-purchase structure and word-of-mouth links are hypotheses created for this fictional teaching example; they are not established by the case-study metrics.",
+      "status": "hypothesis"
+    }
+  ],
+  "layout": {
+    "nodes": {
+      "familiar-prospects": {
+        "x": 220,
+        "y": 210
+      },
+      "qualified-visitors": {
+        "x": 650,
+        "y": 210
+      },
+      "first-time-customers": {
+        "x": 1080,
+        "y": 210
+      },
+      "repeat-customers": {
+        "x": 1080,
+        "y": 590
+      }
+    }
+  },
+  "metadata": {
+    "kind": "fictional case-inspired teaching model",
+    "caseStudySource": "https://theo.agency/case-studies",
+    "abstractionLadder": {
+      "concreteCase": "Theo Agency reports one 2023 eCommerce engagement: revenue +60%, first-time buyers +90%, and return on ad spend +152%. The public summary gives outcome figures, not individual customer journeys or a time series.",
+      "crossCasePattern": "Not established from this one summary. These three figures describe different outcomes; they do not show what repeated across cases or what changed first.",
+      "systemHypothesis": "For this fictional shop, the map proposes a simple customer path: campaign exposure builds familiarity, some familiar people visit, some visitors buy, and some customers buy again. Each transition is a hypothesis; this is a stage-transition sketch, not a proven causal explanation.",
+      "nextEvidence": "Compare dated campaign, visit, first-order, and repeat-order records. Find cases where one stage increased without the next, then check what differed."
+    }
+  }
+}

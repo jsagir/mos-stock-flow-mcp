@@ -1,6 +1,9 @@
 import { z } from "zod";
 export declare const modelSchema: z.ZodObject<{
-    schemaVersion: z.ZodLiteral<"1.0">;
+    schemaVersion: z.ZodEnum<{
+        "1.0": "1.0";
+        1.1: "1.1";
+    }>;
     id: z.ZodString;
     title: z.ZodString;
     boundary: z.ZodString;
@@ -16,6 +19,20 @@ export declare const modelSchema: z.ZodObject<{
         label: z.ZodString;
         parentId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     }, z.core.$strip>>;
+    variables: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        label: z.ZodString;
+        description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        unit: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        evidence: z.ZodEnum<{
+            observed: "observed";
+            reported: "reported";
+            inferred: "inferred";
+            hypothesis: "hypothesis";
+            unknown: "unknown";
+        }>;
+    }, z.core.$strip>>>;
     stocks: z.ZodArray<z.ZodObject<{
         id: z.ZodString;
         label: z.ZodString;

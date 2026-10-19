@@ -5,7 +5,8 @@ export function validateModel(input) {
         return { ok: false, issues: result.error.issues.map(i => ({ path: i.path.join("."), message: i.message })) };
     const model = result.data;
     const issues = [];
-    const all = [...model.actors, ...model.levels, ...model.stocks, ...model.flows, ...model.causalLinks, ...model.assumptions, ...model.evidence];
+    const variables = model.variables ?? [];
+    const all = [...model.actors, ...model.levels, ...variables, ...model.stocks, ...model.flows, ...model.causalLinks, ...model.assumptions, ...model.evidence];
     const ids = new Set();
     for (const item of all) {
         if (ids.has(item.id))
@@ -14,7 +15,7 @@ export function validateModel(input) {
     }
     const levels = new Set(model.levels.map(x => x.id));
     const stocks = new Set(model.stocks.map(x => x.id));
-    const causalNodes = new Set([...model.stocks.map(x => x.id), ...model.actors.map(x => x.id), ...model.levels.map(x => x.id)]);
+    const causalNodes = new Set([...model.stocks.map(x => x.id), ...model.actors.map(x => x.id), ...model.levels.map(x => x.id), ...variables.map(x => x.id)]);
     model.levels.forEach(x => { if (x.parentId && !levels.has(x.parentId))
         issues.push({ path: `levels.${x.id}.parentId`, message: "Parent level does not exist." }); if (x.parentId === x.id)
         issues.push({ path: `levels.${x.id}.parentId`, message: "A level cannot contain itself." }); });

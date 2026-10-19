@@ -5,6 +5,15 @@ export interface Actor {
     label: string;
     description?: string;
 }
+/** A non-accumulating condition or factor, as used in causal-loop diagrams. */
+export interface Variable {
+    id: string;
+    label: string;
+    description?: string;
+    unit?: string | null;
+    value?: number | null;
+    evidence: EvidenceStatus;
+}
 export interface Level {
     id: string;
     label: string;
@@ -50,7 +59,7 @@ export interface Layout {
     }>;
 }
 export interface Model {
-    schemaVersion: "1.0";
+    schemaVersion: "1.0" | "1.1";
     id: string;
     title: string;
     boundary: string;
@@ -60,6 +69,8 @@ export interface Model {
     levels: Level[];
     stocks: Stock[];
     flows: Flow[];
+    /** Optional for backwards compatibility with existing 1.0 models. */
+    variables?: Variable[];
     causalLinks: CausalLink[];
     assumptions: Note[];
     evidence: Note[];

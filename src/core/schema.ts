@@ -5,14 +5,15 @@ const label = z.string().trim().min(1).max(LIMITS.label);
 const evidenceStatus = z.enum(["observed", "reported", "inferred", "hypothesis", "unknown"]);
 const nullableText = z.string().max(LIMITS.text).nullable().optional();
 const actor = z.object({ id, label, description: nullableText });
+const variable = z.object({ id, label, description: nullableText, unit: nullableText, value: z.number().finite().nullable().optional(), evidence: evidenceStatus });
 const level = z.object({ id, label, parentId: id.nullable().optional() });
 const stock = z.object({ id, label, description: nullableText, unit: nullableText, value: z.number().finite().nullable().optional(), levelId: id.nullable().optional(), evidence: evidenceStatus });
 const flow = z.object({ id, label, fromStockId: id.nullable().optional(), toStockId: id.nullable().optional(), unit: nullableText, rate: z.number().finite().nullable().optional(), evidence: evidenceStatus, delay: nullableText });
 const causalLink = z.object({ id, fromId: id, toId: id, polarity: z.enum(["positive", "negative", "unknown"]), label: z.string().max(LIMITS.label).optional(), evidence: evidenceStatus, delay: nullableText });
 const note = z.object({ id, text: z.string().max(LIMITS.text), status: evidenceStatus });
 export const modelSchema = z.object({
-  schemaVersion: z.literal("1.0"), id, title: label, boundary: z.string().max(LIMITS.text), purpose: z.string().max(LIMITS.text),
-  timeHorizon: nullableText, actors: z.array(actor).max(LIMITS.entities), levels: z.array(level).max(LIMITS.entities),
+  schemaVersion: z.enum(["1.0", "1.1"]), id, title: label, boundary: z.string().max(LIMITS.text), purpose: z.string().max(LIMITS.text),
+  timeHorizon: nullableText, actors: z.array(actor).max(LIMITS.entities), levels: z.array(level).max(LIMITS.entities), variables: z.array(variable).max(LIMITS.entities).optional(),
   stocks: z.array(stock).max(LIMITS.entities), flows: z.array(flow).max(LIMITS.entities), causalLinks: z.array(causalLink).max(LIMITS.entities),
   assumptions: z.array(note).max(LIMITS.entities), evidence: z.array(note).max(LIMITS.entities),
   layout: z.object({ nodes: z.record(id, z.object({ x: z.number().finite(), y: z.number().finite() })) }),

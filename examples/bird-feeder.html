@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Bird Feeder — a feedback system</title>
+<style>
+:root{color-scheme:light;--ink:#172b32;--muted:#526a70;--paper:#f6f8f5;--line:#d4dfda;--green:#16735f;--green-pale:#e1f1e9;--rust:#a64e2c;--rust-pale:#fff0e6;--yellow:#f0c95a}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}main{max-width:1420px;margin:auto;padding:34px clamp(16px,4vw,52px) 48px}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:28px;margin-bottom:22px}h1{font-size:clamp(32px,4vw,48px);line-height:1.05;letter-spacing:-.035em;margin:0 0 12px}.lede{max-width:68ch;margin:0;color:var(--muted);font-size:17px}.goal{flex:0 0 245px;padding:14px 17px;border:1px solid var(--line);border-radius:14px;background:#fff}.goal strong{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.goal span{display:block;margin-top:4px;font-size:18px;font-weight:700;line-height:1.3}
+.canvas{overflow:auto;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 10px 28px #173b3a0c}.canvas svg{display:block;width:100%;min-width:880px;height:auto}.region{fill:var(--muted);font-size:13px;font-weight:750;letter-spacing:.11em}.loop-pill rect{fill:var(--green);rx:12}.loop-pill text{fill:#fff;font-size:13px;font-weight:800;letter-spacing:.04em}.edge path{fill:none;stroke:var(--green);stroke-width:2.5;marker-end:url(#arrow)}.edge .polarity{fill:#fff;stroke:var(--green);stroke-width:1.5}.edge text{fill:var(--green);font-size:14px;font-weight:800;text-anchor:middle}.node circle{fill:var(--green-pale);stroke:var(--green);stroke-width:2.5}.node text{fill:var(--ink);font-size:16px;font-weight:680;text-anchor:middle}
+.key{display:flex;gap:20px;flex-wrap:wrap;padding:12px 18px;border-top:1px solid #e5ece8;color:var(--muted);font-size:14px}.key span{display:inline-flex;align-items:center;gap:8px}.key i{width:22px;height:3px;border-radius:3px;background:var(--green)}.key b{display:grid;place-items:center;width:20px;height:20px;border:1px solid var(--green);border-radius:50%;color:var(--green);font-size:12px}
+.mobile-loop{display:none}
+.effects{margin-top:28px}.effects h2{font-size:23px;letter-spacing:-.02em;margin:0 0 5px}.effects-intro{margin:0 0 14px;color:var(--muted)}.paths{border-top:1px solid var(--line)}.path{display:grid;grid-template-columns:minmax(175px, .7fr) minmax(0,2fr);gap:18px;padding:15px 6px;border-bottom:1px solid var(--line);align-items:start}.path h3{font-size:15px;line-height:1.35;margin:2px 0;color:var(--rust)}.steps{display:flex;align-items:center;flex-wrap:wrap;gap:7px 8px}.step{padding:5px 9px;border:1px solid #e4c9ba;border-radius:9px;background:var(--rust-pale);font-size:14px;line-height:1.35}.arrow{display:inline-flex;align-items:center;gap:3px;color:var(--rust);font-size:14px;font-weight:750}.arrow small{font-size:11px}.takeaway{display:grid;grid-template-columns:1fr auto;align-items:center;gap:22px;margin-top:26px;padding:20px 22px;border-radius:16px;background:#173b3a;color:white}.takeaway strong{font-size:18px}.takeaway p{margin:4px 0 0;color:#d5e5de}.question{max-width:280px;padding:10px 14px;border-radius:10px;background:var(--yellow);color:#263430;font-weight:750;text-align:center}footer{margin-top:14px;color:var(--muted);font-size:13px}
+@media(max-width:700px){main{padding-top:22px}header{display:block}.goal{margin-top:16px}.canvas svg{display:none}.mobile-loop{display:block;list-style:none;padding:20px;margin:0}.mobile-loop li{position:relative;padding:12px 14px;border:1.5px solid var(--green);border-radius:12px;background:var(--green-pale);font-weight:650;line-height:1.35}.mobile-loop li+li{margin-top:28px}.mobile-loop li+li:before{content:"+  ↓";position:absolute;top:-26px;left:50%;transform:translateX(-50%);color:var(--green);font-weight:800;white-space:pre}.mobile-loop:after{content:"+  ↺  back to Pleasant breakfast";display:block;margin:13px 4px 0;color:var(--green);font-size:13px;font-weight:750;text-align:center}.path{grid-template-columns:1fr;gap:8px;padding:13px 2px}.takeaway{grid-template-columns:1fr}.question{max-width:none}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div><h1>The bird feeder</h1><p class="lede">A person adds a bird feeder to make breakfast more pleasant. The lecture traces the reinforcing loop—and then follows the side effects back to the original frustration.</p></div>
+    <div class="goal"><strong>Person’s goal</strong><span>Enjoy a pleasant breakfast</span></div>
+  </header>
+
+  <section class="canvas" aria-label="Causal loop and consequences">
+    <svg viewBox="0 0 1200 660" role="img" aria-labelledby="map-title map-desc">
+      <title id="map-title">The intended reinforcing loop in the bird-feeder case</title>
+      <desc id="map-desc">A seven-step loop: pleasant breakfast, dealing with frustrations, birds outside, a bird feeder, more birds at the feeder, more birds outside, and more pleasant breakfasts, which returns to the start.</desc>
+      <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#16735f"/></marker></defs>
+      <text class="region" x="34" y="38">THE INTENDED FEEDBACK</text>
+      <g class="loop-pill" transform="translate(492 24)"><rect width="160" height="28"/><text x="14" y="19">R1 · REINFORCING</text></g>
+
+      <g class="edge"><path d="M240 187 Q292 105 350 118"/><circle class="polarity" cx="298" cy="134" r="12"/><text x="298" y="139">+</text></g>
+      <g class="edge"><path d="M510 118 H650"/><circle class="polarity" cx="580" cy="118" r="12"/><text x="580" y="123">+</text></g>
+      <g class="edge"><path d="M810 126 Q910 110 958 175"/><circle class="polarity" cx="887" cy="129" r="12"/><text x="887" y="134">+</text></g>
+      <g class="edge"><path d="M1032 258 V346"/><circle class="polarity" cx="1032" cy="302" r="12"/><text x="1032" y="307">+</text></g>
+      <g class="edge"><path d="M955 477 Q892 543 807 551"/><circle class="polarity" cx="887" cy="525" r="12"/><text x="887" y="530">+</text></g>
+      <g class="edge"><path d="M650 552 H510"/><circle class="polarity" cx="580" cy="552" r="12"/><text x="580" y="557">+</text></g>
+      <g class="edge"><path d="M350 530 Q230 500 183 278"/><circle class="polarity" cx="259" cy="482" r="12"/><text x="259" y="487">+</text></g>
+
+      <g class="node"><circle cx="165" cy="210" r="78"/><text x="165" y="204"><tspan x="165">Pleasant</tspan><tspan x="165" dy="22">breakfast</tspan></text></g>
+      <g class="node"><circle cx="430" cy="120" r="80"/><text x="430" y="96"><tspan x="430">Deals with</tspan><tspan x="430" dy="21">life’s</tspan><tspan x="430" dy="21">frustrations</tspan></text></g>
+      <g class="node"><circle cx="730" cy="120" r="78"/><text x="730" y="114"><tspan x="730">Birds</tspan><tspan x="730" dy="22">outside</tspan></text></g>
+      <g class="node"><circle cx="1032" cy="210" r="76"/><text x="1032" y="204"><tspan x="1032">Bird</tspan><tspan x="1032" dy="22">feeder</tspan></text></g>
+      <g class="node"><circle cx="1032" cy="430" r="84"/><text x="1032" y="412"><tspan x="1032">More birds</tspan><tspan x="1032" dy="21">at the</tspan><tspan x="1032" dy="21">feeder</tspan></text></g>
+      <g class="node"><circle cx="730" cy="552" r="78"/><text x="730" y="546"><tspan x="730">More birds</tspan><tspan x="730" dy="22">outside</tspan></text></g>
+      <g class="node"><circle cx="430" cy="552" r="80"/><text x="430" y="546"><tspan x="430">More pleasant</tspan><tspan x="430" dy="22">breakfasts</tspan></text></g>
+    </svg>
+    <ol class="mobile-loop" aria-label="Reinforcing loop, read in order">
+      <li>Pleasant breakfast</li>
+      <li>Deals with life’s frustrations</li>
+      <li>Birds outside</li>
+      <li>Bird feeder</li>
+      <li>More birds at the feeder</li>
+      <li>More birds outside</li>
+      <li>More pleasant breakfasts</li>
+    </ol>
+    <div class="key"><span><i></i> Reinforcing causal loop</span><span><b>+</b> Both variables move in the same direction</span></div>
+  </section>
+
+  <section class="effects" aria-labelledby="effects-title">
+    <h2 id="effects-title">Then follow the side effects</h2>
+    <p class="effects-intro">The PWS chapter traces how more birds at the feeder can bring back frustration through several routes:</p>
+    <div class="paths">
+      <div class="path"><h3>Seed and money</h3><div class="steps"><span class="step">More birds</span><span class="arrow">→<small>+</small></span><span class="step">More feed</span><span class="arrow">→<small>+</small></span><span class="step">More trips to the store</span><span class="arrow">→<small>+</small></span><span class="step">More money worries</span><span class="arrow">→<small>+</small></span><span class="step">More frustration</span></div></div>
+      <div class="path"><h3>Squirrels</h3><div class="steps"><span class="step">Squirrels arrive</span><span class="arrow">→<small>−</small></span><span class="step">Birds get chased off</span><span class="arrow">→</span><span class="step">Less birdsong at breakfast</span></div></div>
+      <div class="path"><h3>Spilled feed</h3><div class="steps"><span class="step">Squirrels spill feed</span><span class="arrow">→<small>+</small></span><span class="step">More mess and weeds</span><span class="arrow">→<small>+</small></span><span class="step">More cleanup work</span><span class="arrow">→<small>+</small></span><span class="step">More frustration</span></div></div>
+      <div class="path"><h3>Patio cleanup</h3><div class="steps"><span class="step">More birds</span><span class="arrow">→<small>+</small></span><span class="step">Bird poop on patio</span><span class="arrow">→<small>+</small></span><span class="step">More cleanup</span><span class="arrow">→<small>+</small></span><span class="step">More frustration</span></div></div>
+    </div>
+  </section>
+
+  <section class="takeaway"><div><strong>Have I really reduced my frustration?</strong><p>The diagram makes the intended benefit and the unintended costs visible together. Their real size and timing would need evidence.</p></div><div class="question">A map to investigate, not proof of causation</div></section>
+  <footer>Source: PWS Book, Week 6, “Systems Problems,” bird-feeder case. Causal relationships are source-reported and qualitative; no rates or measured outcomes are supplied.</footer>
+</main>
+</body>
+</html>

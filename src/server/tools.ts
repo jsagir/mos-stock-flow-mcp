@@ -7,7 +7,7 @@ import { renderSvg } from "../cli/commands.js";
 import { appHtml } from "./app-resource.js";
 
 export function createServer() {
-  const server = new McpServer({ name: "m:os-systems", version: "0.1.0" }, { maxToolInputElements: 12_000 });
+  const server = new McpServer({ name: "m:os-systems", version: "0.2.0" }, { maxToolInputElements: 12_000 });
   const modelArg = z.string().max(LIMITS.bytes);
   server.registerTool("model_create", { description: "Create a draft `/m:os` system model; pass a complete v1 JSON model. Returns the complete validated model.", inputSchema: { model: modelArg }, _meta: { ui: { resourceUri: "ui://mos/stock-flow/editor.html" } } }, async ({ model }) => {
     try { const parsed = parseModel(model); return { content: [{ type: "text", text: `Created draft: ${parsed.title}` }], structuredContent: { model: parsed } }; }

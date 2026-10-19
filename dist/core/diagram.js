@@ -1,21 +1,25 @@
 const esc = (s) => s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const evidenceClass = (e) => e === "observed" || e === "reported" ? "solid" : e === "inferred" ? "inferred" : e === "hypothesis" ? "hypothesis" : "unknown";
 /** Conventional system-dynamics notation: stocks are boxes, material flows are pipes with valves, influences are dashed arrows. */
-export function renderDiagram(model) {
-    const all = [...model.stocks, ...model.actors, ...model.levels];
+export function renderDiagram(model, simulatedValues) {
+    const all = [...model.stocks, ...(model.variables ?? []), ...model.actors, ...model.levels];
     const points = new Map(all.map((n, i) => [n.id, model.layout.nodes[n.id] ?? { x: 100 + (i % 3) * 340, y: 100 + Math.floor(i / 3) * 240 }]));
-    const size = (id) => model.stocks.some(s => s.id === id) ? { w: 220, h: 94 } : { w: 190, h: 72 };
+    const size = (id) => model.stocks.some(s => s.id === id) || model.variables?.some(v => v.id === id) ? { w: 220, h: 94 } : { w: 190, h: 72 };
     const p = (id) => points.get(id) ?? { x: 100, y: 100 };
     const minX = Math.min(0, ...all.map(n => p(n.id).x - 220));
     const minY = Math.min(0, ...all.map(n => p(n.id).y - 80));
     const maxX = Math.max(900, ...all.map(n => p(n.id).x + size(n.id).w + 180));
     const maxY = Math.max(520, ...all.map(n => p(n.id).y + size(n.id).h + 150));
+    const labelBoxes = [];
     const nodes = all.map(n => {
-        const q = p(n.id), stock = model.stocks.find(s => s.id === n.id), kind = stock ? "STOCK" : model.actors.some(a => a.id === n.id) ? "ACTOR" : "LEVEL";
+        const q = p(n.id), stock = model.stocks.find(s => s.id === n.id), variable = model.variables?.find(v => v.id === n.id), kind = stock ? "STOCK" : variable ? "VARIABLE" : model.actors.some(a => a.id === n.id) ? "ACTOR" : "LEVEL";
         const w = size(n.id).w, h = size(n.id).h;
-        if (stock)
-            return `<g class="stock"><rect x="${q.x}" y="${q.y}" width="${w}" height="${h}"/><text class="node-label" x="${q.x + 12}" y="${q.y + 32}">${esc(n.label)}</text><text class="node-meta" x="${q.x + 12}" y="${q.y + 66}">${esc([stock.value ?? "", stock.unit ?? ""].filter(Boolean).join(" ") || "value unknown")}</text></g>`;
-        return `<g class="aux"><ellipse cx="${q.x + w / 2}" cy="${q.y + h / 2}" rx="${w / 2}" ry="${h / 2}"/><text class="node-kind" x="${q.x + w / 2}" y="${q.y + 25}" text-anchor="middle">${kind}</text><text class="node-label" x="${q.x + w / 2}" y="${q.y + 48}" text-anchor="middle">${esc(n.label)}</text></g>`;
+        if (stock) {
+            const value = simulatedValues?.[stock.id] ?? stock.value;
+            return `<g class="stock node" data-node-id="${esc(n.id)}" tabindex="0" role="button" aria-label="Stock: ${esc(n.label)}"><rect x="${q.x}" y="${q.y}" width="${w}" height="${h}"/><text class="node-label" x="${q.x + 12}" y="${q.y + 32}">${esc(n.label)}</text><text class="node-meta" x="${q.x + 12}" y="${q.y + 66}">${esc([value ?? "", stock.unit ?? ""].filter(Boolean).join(" ") || "value unknown")}</text></g>`;
+        }
+        const meta = variable ? [variable.value ?? "", variable.unit ?? ""].filter(Boolean).join(" ") || "value unknown" : "";
+        return `<g class="aux node ${variable ? "variable" : ""}" data-node-id="${esc(n.id)}" tabindex="0" role="button" aria-label="${kind}: ${esc(n.label)}"><ellipse cx="${q.x + w / 2}" cy="${q.y + h / 2}" rx="${w / 2}" ry="${h / 2}"/><text class="node-kind" x="${q.x + w / 2}" y="${q.y + (variable ? 21 : 25)}" text-anchor="middle">${kind}</text><text class="node-label" x="${q.x + w / 2}" y="${q.y + (variable ? 43 : 48)}" text-anchor="middle">${esc(n.label)}</text>${variable ? `<text class="node-meta" x="${q.x + w / 2}" y="${q.y + 64}" text-anchor="middle">${esc(meta)}</text>` : ""}</g>`;
     }).join("");
     const clouds = new Set();
     const flows = model.flows.map((f, i) => {
@@ -73,8 +77,11 @@ export function renderDiagram(model) {
         }
         if (row)
             rows.push(row);
-        const label = `<text class="flow-label" x="${labelX}" y="${labelY - (rows.length - 1) * 13}" text-anchor="${labelAnchor}">${rows.map((line, j) => `<tspan x="${labelX}" dy="${j ? 13 : 0}">${esc(line)}</tspan>`).join("")}</text>`;
-        return `<g class="flow ${evidenceClass(f.evidence)}"><path d="${d}" class="pipe-under"/><path d="${d}" class="pipe" marker-end="url(#flow-arrow)"/><circle class="valve" cx="${routeX}" cy="${routeY}" r="12"/><path class="valve-mark" d="M${routeX - 7},${routeY - 7} L${routeX},${routeY} L${routeX - 7},${routeY + 7} M${routeX + 7},${routeY - 7} L${routeX},${routeY} L${routeX + 7},${routeY + 7}"/>${label}</g>`;
+        const labelTop = labelY - (rows.length - 1) * 13;
+        const flowLabelWidth = Math.max(36, Math.min(240, Math.max(...rows.map(line => line.length)) * 7));
+        labelBoxes.push({ x: labelAnchor === "start" ? labelX : labelX - flowLabelWidth / 2, y: labelTop - 14, w: flowLabelWidth, h: rows.length * 14 });
+        const label = `<text class="flow-label" x="${labelX}" y="${labelTop}" text-anchor="${labelAnchor}">${rows.map((line, j) => `<tspan x="${labelX}" dy="${j ? 13 : 0}">${esc(line)}</tspan>`).join("")}</text>`;
+        return `<g class="flow ${evidenceClass(f.evidence)}" data-flow-id="${esc(f.id)}" tabindex="0" role="button" aria-label="Flow: ${esc(f.label)}"><path d="${d}" class="pipe-under"/><path d="${d}" class="pipe" marker-end="url(#flow-arrow)"/><circle class="valve" cx="${routeX}" cy="${routeY}" r="12"/><path class="valve-mark" d="M${routeX - 7},${routeY - 7} L${routeX},${routeY} L${routeX - 7},${routeY + 7} M${routeX + 7},${routeY - 7} L${routeX},${routeY} L${routeX + 7},${routeY + 7}"/>${label}</g>`;
     }).join("");
     const links = model.causalLinks.map(link => {
         const a = p(link.fromId), b = p(link.toId), as = size(link.fromId), bs = size(link.toId);
@@ -86,7 +93,15 @@ export function renderDiagram(model) {
         const y2 = vertical ? bcy + (bcy >= acy ? -bs.h / 2 : bs.h / 2) : bcy;
         const mx = (x1 + x2) / 2, my = vertical ? (y1 + y2) / 2 : Math.min(y1, y2) - Math.max(48, Math.abs(x2 - x1) * 0.18);
         const pol = link.polarity === "positive" ? "+" : link.polarity === "negative" ? "−" : "?";
-        return `<g class="causal ${evidenceClass(link.evidence)}"><path d="M${x1},${y1} Q${mx},${my} ${x2},${y2}" marker-end="url(#causal-arrow)"/><circle cx="${mx}" cy="${my}" r="12" class="polarity-badge"/><text x="${mx}" y="${my + 5}" text-anchor="middle" class="polarity">${pol}</text>${link.label ? `<text x="${mx}" y="${my - 15}" text-anchor="middle" class="link-label">${esc(link.label)}</text>` : ""}</g>`;
+        let labelY = my - 15;
+        if (link.label) {
+            const width = Math.max(42, Math.min(280, link.label.length * 7));
+            const overlaps = (y) => labelBoxes.some(box => mx + width / 2 > box.x && mx - width / 2 < box.x + box.w && y > box.y - 14 && y - 14 < box.y + box.h);
+            for (let attempt = 0; attempt < 12 && overlaps(labelY); attempt++)
+                labelY += attempt % 2 === 0 ? -22 * (attempt / 2 + 1) : 22 * ((attempt + 1) / 2);
+            labelBoxes.push({ x: mx - width / 2, y: labelY - 14, w: width, h: 16 });
+        }
+        return `<g class="causal ${evidenceClass(link.evidence)}" data-link-id="${esc(link.id)}" tabindex="0" role="button" aria-label="Influence: ${esc(link.label || link.id)}"><path d="M${x1},${y1} Q${mx},${my} ${x2},${y2}" marker-end="url(#causal-arrow)"/><circle cx="${mx}" cy="${my}" r="12" class="polarity-badge"/><text x="${mx}" y="${my + 5}" text-anchor="middle" class="polarity">${pol}</text>${link.label ? `<text x="${mx}" y="${labelY}" text-anchor="middle" class="link-label">${esc(link.label)}</text>` : ""}</g>`;
     }).join("");
     return { viewBox: `${minX} ${minY} ${maxX - minX} ${maxY - minY}`, width: maxX - minX, height: maxY - minY, markup: `<defs><marker id="flow-arrow" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0L9 4L0 8Z"/></marker><marker id="causal-arrow" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0L9 4L0 8Z"/></marker></defs><g class="clouds">${[...clouds].map(d => `<path d="${d}"/>`).join("")}</g>${flows}${links}${nodes}` };
 }

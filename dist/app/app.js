@@ -1178,17 +1178,17 @@
     if (hasChecks) {
       throw new Error(`.${name}() cannot be used on object schemas containing refinements`);
     }
-    const selected = mask ? new Set(maskedKeys(schema, mask)) : void 0;
+    const selected2 = mask ? new Set(maskedKeys(schema, mask)) : void 0;
     const newShape = {};
-    mirrorShape(newShape, schema, Reflect.ownKeys(sourceShape(schema)), Class2 && ((value, key) => selected && !selected.has(key) ? value : new Class2({ type: "optional", innerType: value })));
+    mirrorShape(newShape, schema, Reflect.ownKeys(sourceShape(schema)), Class2 && ((value, key) => selected2 && !selected2.has(key) ? value : new Class2({ type: "optional", innerType: value })));
     return clone(schema, mergeDefs(schema._zod.def, { shape: newShape, checks: [] }));
   }
   function required(Class2, schema, mask) {
-    const selected = mask ? new Set(maskedKeys(schema, mask)) : void 0;
+    const selected2 = mask ? new Set(maskedKeys(schema, mask)) : void 0;
     const newShape = {};
     mirrorShape(newShape, schema, Reflect.ownKeys(sourceShape(schema)), (value, key) => (
       // overwrite with non-optional
-      selected && !selected.has(key) ? value : new Class2({ type: "nonoptional", innerType: value })
+      selected2 && !selected2.has(key) ? value : new Class2({ type: "nonoptional", innerType: value })
     ));
     return clone(schema, mergeDefs(schema._zod.def, { shape: newShape }));
   }
@@ -3601,14 +3601,14 @@ ${content.join("\n")}
       const shape = zod.def.shape;
       const propValues = {};
       for (const key in shape) {
-        const field = shape[key]._zod;
-        if (field.values) {
+        const field2 = shape[key]._zod;
+        if (field2.values) {
           if (!Object.prototype.hasOwnProperty.call(propValues, key)) {
             assignProp(propValues, key, /* @__PURE__ */ new Set());
           }
-          for (const v of field.values)
+          for (const v of field2.values)
             propValues[key].add(v);
-          if (field.optin !== void 0)
+          if (field2.optin !== void 0)
             propValues[key].add(void 0);
         }
       }
@@ -16546,8 +16546,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
     }
     const requiredKeys = [];
     for (const key of Object.keys(shape)) {
-      const field = def.shape[key];
-      if (ctx.io === "input" ? inputOptin(field) === void 0 : field._zod.optout === void 0) {
+      const field2 = def.shape[key];
+      if (ctx.io === "input" ? inputOptin(field2) === void 0 : field2._zod.optout === void 0) {
         requiredKeys.push(key);
       }
     }
@@ -25734,7 +25734,7 @@ container holding the app. Specify either width or maxWidth, and either height o
 
   // src/core/fixture.ts
   var fixture = {
-    schemaVersion: "1.0",
+    schemaVersion: "1.1",
     id: "community-garden",
     title: "Community garden participation",
     boundary: "A neighborhood garden across one growing season",
@@ -25742,12 +25742,21 @@ container holding the app. Specify either width or maxWidth, and either height o
     timeHorizon: "One growing season",
     actors: [{ id: "volunteers", label: "Volunteers" }],
     levels: [{ id: "garden", label: "Garden" }],
+    variables: [
+      { id: "garden-quality", label: "Garden quality", description: "How useful and welcoming the shared space feels", evidence: "hypothesis" },
+      { id: "volunteer-interest", label: "Volunteer interest", description: "People considering joining or returning", evidence: "hypothesis" }
+    ],
     stocks: [{ id: "active-volunteers", label: "Active volunteers", unit: "people", value: null, levelId: "garden", evidence: "unknown" }, { id: "beds", label: "Available garden beds", unit: "beds", evidence: "reported" }],
     flows: [{ id: "joining", label: "People joining", toStockId: "active-volunteers", unit: "people/week", rate: null, evidence: "unknown", delay: "May lag outreach by several weeks" }, { id: "leaving", label: "People leaving", fromStockId: "active-volunteers", unit: "people/week", rate: null, evidence: "hypothesis" }],
-    causalLinks: [{ id: "care-link", fromId: "active-volunteers", toId: "beds", polarity: "positive", label: "Care may increase usable beds", evidence: "hypothesis" }],
+    causalLinks: [
+      { id: "care-link", fromId: "active-volunteers", toId: "beds", polarity: "positive", label: "Care may increase usable beds", evidence: "hypothesis" },
+      { id: "volunteers-quality", fromId: "active-volunteers", toId: "garden-quality", polarity: "positive", label: "More care may improve the garden", evidence: "hypothesis" },
+      { id: "quality-interest", fromId: "garden-quality", toId: "volunteer-interest", polarity: "positive", label: "A welcoming garden may draw people", evidence: "hypothesis" },
+      { id: "interest-volunteers", fromId: "volunteer-interest", toId: "active-volunteers", polarity: "positive", label: "Interest may become participation", evidence: "hypothesis" }
+    ],
     assumptions: [{ id: "assumption-season", text: "Seasonal availability affects participation.", status: "hypothesis" }],
     evidence: [],
-    layout: { nodes: { "active-volunteers": { x: 240, y: 180 }, beds: { x: 540, y: 180 } } }
+    layout: { nodes: { "active-volunteers": { x: 220, y: 180 }, beds: { x: 820, y: 180 }, "garden-quality": { x: 820, y: 440 }, "volunteer-interest": { x: 220, y: 440 }, volunteers: { x: 220, y: 620 }, garden: { x: 820, y: 620 } } }
   };
 
   // src/core/model.ts
@@ -25759,13 +25768,14 @@ container holding the app. Specify either width or maxWidth, and either height o
   var evidenceStatus = external_exports.enum(["observed", "reported", "inferred", "hypothesis", "unknown"]);
   var nullableText = external_exports.string().max(LIMITS.text).nullable().optional();
   var actor = external_exports.object({ id, label, description: nullableText });
+  var variable = external_exports.object({ id, label, description: nullableText, unit: nullableText, value: external_exports.number().finite().nullable().optional(), evidence: evidenceStatus });
   var level = external_exports.object({ id, label, parentId: id.nullable().optional() });
   var stock = external_exports.object({ id, label, description: nullableText, unit: nullableText, value: external_exports.number().finite().nullable().optional(), levelId: id.nullable().optional(), evidence: evidenceStatus });
   var flow = external_exports.object({ id, label, fromStockId: id.nullable().optional(), toStockId: id.nullable().optional(), unit: nullableText, rate: external_exports.number().finite().nullable().optional(), evidence: evidenceStatus, delay: nullableText });
   var causalLink = external_exports.object({ id, fromId: id, toId: id, polarity: external_exports.enum(["positive", "negative", "unknown"]), label: external_exports.string().max(LIMITS.label).optional(), evidence: evidenceStatus, delay: nullableText });
   var note = external_exports.object({ id, text: external_exports.string().max(LIMITS.text), status: evidenceStatus });
   var modelSchema = external_exports.object({
-    schemaVersion: external_exports.literal("1.0"),
+    schemaVersion: external_exports.enum(["1.0", "1.1"]),
     id,
     title: label,
     boundary: external_exports.string().max(LIMITS.text),
@@ -25773,6 +25783,7 @@ container holding the app. Specify either width or maxWidth, and either height o
     timeHorizon: nullableText,
     actors: external_exports.array(actor).max(LIMITS.entities),
     levels: external_exports.array(level).max(LIMITS.entities),
+    variables: external_exports.array(variable).max(LIMITS.entities).optional(),
     stocks: external_exports.array(stock).max(LIMITS.entities),
     flows: external_exports.array(flow).max(LIMITS.entities),
     causalLinks: external_exports.array(causalLink).max(LIMITS.entities),
@@ -25788,7 +25799,8 @@ container holding the app. Specify either width or maxWidth, and either height o
     if (!result.success) return { ok: false, issues: result.error.issues.map((i2) => ({ path: i2.path.join("."), message: i2.message })) };
     const model2 = result.data;
     const issues = [];
-    const all = [...model2.actors, ...model2.levels, ...model2.stocks, ...model2.flows, ...model2.causalLinks, ...model2.assumptions, ...model2.evidence];
+    const variables = model2.variables ?? [];
+    const all = [...model2.actors, ...model2.levels, ...variables, ...model2.stocks, ...model2.flows, ...model2.causalLinks, ...model2.assumptions, ...model2.evidence];
     const ids = /* @__PURE__ */ new Set();
     for (const item of all) {
       if (ids.has(item.id)) issues.push({ path: item.id, message: "IDs must be unique across the model." });
@@ -25796,7 +25808,7 @@ container holding the app. Specify either width or maxWidth, and either height o
     }
     const levels = new Set(model2.levels.map((x2) => x2.id));
     const stocks = new Set(model2.stocks.map((x2) => x2.id));
-    const causalNodes = /* @__PURE__ */ new Set([...model2.stocks.map((x2) => x2.id), ...model2.actors.map((x2) => x2.id), ...model2.levels.map((x2) => x2.id)]);
+    const causalNodes = /* @__PURE__ */ new Set([...model2.stocks.map((x2) => x2.id), ...model2.actors.map((x2) => x2.id), ...model2.levels.map((x2) => x2.id), ...variables.map((x2) => x2.id)]);
     model2.levels.forEach((x2) => {
       if (x2.parentId && !levels.has(x2.parentId)) issues.push({ path: `levels.${x2.id}.parentId`, message: "Parent level does not exist." });
       if (x2.parentId === x2.id) issues.push({ path: `levels.${x2.id}.parentId`, message: "A level cannot contain itself." });
@@ -25836,20 +25848,25 @@ container holding the app. Specify either width or maxWidth, and either height o
   // src/core/diagram.ts
   var esc2 = (s) => s.replace(/[&<>"']/g, (c2) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c2]);
   var evidenceClass = (e) => e === "observed" || e === "reported" ? "solid" : e === "inferred" ? "inferred" : e === "hypothesis" ? "hypothesis" : "unknown";
-  function renderDiagram(model2) {
-    const all = [...model2.stocks, ...model2.actors, ...model2.levels];
+  function renderDiagram(model2, simulatedValues) {
+    const all = [...model2.stocks, ...model2.variables ?? [], ...model2.actors, ...model2.levels];
     const points = new Map(all.map((n, i2) => [n.id, model2.layout.nodes[n.id] ?? { x: 100 + i2 % 3 * 340, y: 100 + Math.floor(i2 / 3) * 240 }]));
-    const size = (id2) => model2.stocks.some((s) => s.id === id2) ? { w: 220, h: 94 } : { w: 190, h: 72 };
+    const size = (id2) => model2.stocks.some((s) => s.id === id2) || model2.variables?.some((v) => v.id === id2) ? { w: 220, h: 94 } : { w: 190, h: 72 };
     const p2 = (id2) => points.get(id2) ?? { x: 100, y: 100 };
     const minX = Math.min(0, ...all.map((n) => p2(n.id).x - 220));
     const minY = Math.min(0, ...all.map((n) => p2(n.id).y - 80));
     const maxX = Math.max(900, ...all.map((n) => p2(n.id).x + size(n.id).w + 180));
     const maxY = Math.max(520, ...all.map((n) => p2(n.id).y + size(n.id).h + 150));
+    const labelBoxes = [];
     const nodes = all.map((n) => {
-      const q2 = p2(n.id), stock2 = model2.stocks.find((s) => s.id === n.id), kind = stock2 ? "STOCK" : model2.actors.some((a2) => a2.id === n.id) ? "ACTOR" : "LEVEL";
+      const q2 = p2(n.id), stock2 = model2.stocks.find((s) => s.id === n.id), variable2 = model2.variables?.find((v) => v.id === n.id), kind = stock2 ? "STOCK" : variable2 ? "VARIABLE" : model2.actors.some((a2) => a2.id === n.id) ? "ACTOR" : "LEVEL";
       const w2 = size(n.id).w, h2 = size(n.id).h;
-      if (stock2) return `<g class="stock"><rect x="${q2.x}" y="${q2.y}" width="${w2}" height="${h2}"/><text class="node-label" x="${q2.x + 12}" y="${q2.y + 32}">${esc2(n.label)}</text><text class="node-meta" x="${q2.x + 12}" y="${q2.y + 66}">${esc2([stock2.value ?? "", stock2.unit ?? ""].filter(Boolean).join(" ") || "value unknown")}</text></g>`;
-      return `<g class="aux"><ellipse cx="${q2.x + w2 / 2}" cy="${q2.y + h2 / 2}" rx="${w2 / 2}" ry="${h2 / 2}"/><text class="node-kind" x="${q2.x + w2 / 2}" y="${q2.y + 25}" text-anchor="middle">${kind}</text><text class="node-label" x="${q2.x + w2 / 2}" y="${q2.y + 48}" text-anchor="middle">${esc2(n.label)}</text></g>`;
+      if (stock2) {
+        const value = simulatedValues?.[stock2.id] ?? stock2.value;
+        return `<g class="stock node" data-node-id="${esc2(n.id)}" tabindex="0" role="button" aria-label="Stock: ${esc2(n.label)}"><rect x="${q2.x}" y="${q2.y}" width="${w2}" height="${h2}"/><text class="node-label" x="${q2.x + 12}" y="${q2.y + 32}">${esc2(n.label)}</text><text class="node-meta" x="${q2.x + 12}" y="${q2.y + 66}">${esc2([value ?? "", stock2.unit ?? ""].filter(Boolean).join(" ") || "value unknown")}</text></g>`;
+      }
+      const meta3 = variable2 ? [variable2.value ?? "", variable2.unit ?? ""].filter(Boolean).join(" ") || "value unknown" : "";
+      return `<g class="aux node ${variable2 ? "variable" : ""}" data-node-id="${esc2(n.id)}" tabindex="0" role="button" aria-label="${kind}: ${esc2(n.label)}"><ellipse cx="${q2.x + w2 / 2}" cy="${q2.y + h2 / 2}" rx="${w2 / 2}" ry="${h2 / 2}"/><text class="node-kind" x="${q2.x + w2 / 2}" y="${q2.y + (variable2 ? 21 : 25)}" text-anchor="middle">${kind}</text><text class="node-label" x="${q2.x + w2 / 2}" y="${q2.y + (variable2 ? 43 : 48)}" text-anchor="middle">${esc2(n.label)}</text>${variable2 ? `<text class="node-meta" x="${q2.x + w2 / 2}" y="${q2.y + 64}" text-anchor="middle">${esc2(meta3)}</text>` : ""}</g>`;
     }).join("");
     const clouds = /* @__PURE__ */ new Set();
     const flows = model2.flows.map((f2, i2) => {
@@ -25901,8 +25918,11 @@ container holding the app. Specify either width or maxWidth, and either height o
         } else row += `${row ? " " : ""}${word}`;
       }
       if (row) rows.push(row);
-      const label2 = `<text class="flow-label" x="${labelX}" y="${labelY - (rows.length - 1) * 13}" text-anchor="${labelAnchor}">${rows.map((line, j2) => `<tspan x="${labelX}" dy="${j2 ? 13 : 0}">${esc2(line)}</tspan>`).join("")}</text>`;
-      return `<g class="flow ${evidenceClass(f2.evidence)}"><path d="${d2}" class="pipe-under"/><path d="${d2}" class="pipe" marker-end="url(#flow-arrow)"/><circle class="valve" cx="${routeX}" cy="${routeY}" r="12"/><path class="valve-mark" d="M${routeX - 7},${routeY - 7} L${routeX},${routeY} L${routeX - 7},${routeY + 7} M${routeX + 7},${routeY - 7} L${routeX},${routeY} L${routeX + 7},${routeY + 7}"/>${label2}</g>`;
+      const labelTop = labelY - (rows.length - 1) * 13;
+      const flowLabelWidth = Math.max(36, Math.min(240, Math.max(...rows.map((line) => line.length)) * 7));
+      labelBoxes.push({ x: labelAnchor === "start" ? labelX : labelX - flowLabelWidth / 2, y: labelTop - 14, w: flowLabelWidth, h: rows.length * 14 });
+      const label2 = `<text class="flow-label" x="${labelX}" y="${labelTop}" text-anchor="${labelAnchor}">${rows.map((line, j2) => `<tspan x="${labelX}" dy="${j2 ? 13 : 0}">${esc2(line)}</tspan>`).join("")}</text>`;
+      return `<g class="flow ${evidenceClass(f2.evidence)}" data-flow-id="${esc2(f2.id)}" tabindex="0" role="button" aria-label="Flow: ${esc2(f2.label)}"><path d="${d2}" class="pipe-under"/><path d="${d2}" class="pipe" marker-end="url(#flow-arrow)"/><circle class="valve" cx="${routeX}" cy="${routeY}" r="12"/><path class="valve-mark" d="M${routeX - 7},${routeY - 7} L${routeX},${routeY} L${routeX - 7},${routeY + 7} M${routeX + 7},${routeY - 7} L${routeX},${routeY} L${routeX + 7},${routeY + 7}"/>${label2}</g>`;
     }).join("");
     const links = model2.causalLinks.map((link) => {
       const a2 = p2(link.fromId), b2 = p2(link.toId), as = size(link.fromId), bs = size(link.toId);
@@ -25914,57 +25934,494 @@ container holding the app. Specify either width or maxWidth, and either height o
       const y2 = vertical ? bcy + (bcy >= acy ? -bs.h / 2 : bs.h / 2) : bcy;
       const mx = (x1 + x2) / 2, my = vertical ? (y1 + y2) / 2 : Math.min(y1, y2) - Math.max(48, Math.abs(x2 - x1) * 0.18);
       const pol = link.polarity === "positive" ? "+" : link.polarity === "negative" ? "\u2212" : "?";
-      return `<g class="causal ${evidenceClass(link.evidence)}"><path d="M${x1},${y1} Q${mx},${my} ${x2},${y2}" marker-end="url(#causal-arrow)"/><circle cx="${mx}" cy="${my}" r="12" class="polarity-badge"/><text x="${mx}" y="${my + 5}" text-anchor="middle" class="polarity">${pol}</text>${link.label ? `<text x="${mx}" y="${my - 15}" text-anchor="middle" class="link-label">${esc2(link.label)}</text>` : ""}</g>`;
+      let labelY = my - 15;
+      if (link.label) {
+        const width = Math.max(42, Math.min(280, link.label.length * 7));
+        const overlaps = (y3) => labelBoxes.some((box) => mx + width / 2 > box.x && mx - width / 2 < box.x + box.w && y3 > box.y - 14 && y3 - 14 < box.y + box.h);
+        for (let attempt = 0; attempt < 12 && overlaps(labelY); attempt++) labelY += attempt % 2 === 0 ? -22 * (attempt / 2 + 1) : 22 * ((attempt + 1) / 2);
+        labelBoxes.push({ x: mx - width / 2, y: labelY - 14, w: width, h: 16 });
+      }
+      return `<g class="causal ${evidenceClass(link.evidence)}" data-link-id="${esc2(link.id)}" tabindex="0" role="button" aria-label="Influence: ${esc2(link.label || link.id)}"><path d="M${x1},${y1} Q${mx},${my} ${x2},${y2}" marker-end="url(#causal-arrow)"/><circle cx="${mx}" cy="${my}" r="12" class="polarity-badge"/><text x="${mx}" y="${my + 5}" text-anchor="middle" class="polarity">${pol}</text>${link.label ? `<text x="${mx}" y="${labelY}" text-anchor="middle" class="link-label">${esc2(link.label)}</text>` : ""}</g>`;
     }).join("");
     return { viewBox: `${minX} ${minY} ${maxX - minX} ${maxY - minY}`, width: maxX - minX, height: maxY - minY, markup: `<defs><marker id="flow-arrow" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0L9 4L0 8Z"/></marker><marker id="causal-arrow" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0L9 4L0 8Z"/></marker></defs><g class="clouds">${[...clouds].map((d2) => `<path d="${d2}"/>`).join("")}</g>${flows}${links}${nodes}` };
   }
 
+  // src/core/loops.ts
+  function findFeedbackLoops(model2, maxLoops = 32, maxLength = 12) {
+    const nodes = [...model2.stocks, ...model2.variables ?? [], ...model2.actors, ...model2.levels];
+    const labels = new Map(nodes.map((node2) => [node2.id, node2.label]));
+    const ids = [...labels.keys()].sort();
+    const outgoing = /* @__PURE__ */ new Map();
+    for (const link of model2.causalLinks) outgoing.set(link.fromId, [...outgoing.get(link.fromId) ?? [], link]);
+    const loops = [];
+    let exploredLinks = 0;
+    for (const start of ids) {
+      const pathNodes = [start];
+      const pathLinks = [];
+      const walk = (current) => {
+        if (loops.length >= maxLoops || pathNodes.length > maxLength) return;
+        for (const link of outgoing.get(current) ?? []) {
+          if (++exploredLinks > 25e3) return;
+          if (link.toId === start) {
+            const cycle = [...pathLinks, link];
+            const signsKnown = cycle.every((item) => item.polarity !== "unknown");
+            const negatives = cycle.filter((item) => item.polarity === "negative").length;
+            loops.push({
+              id: cycle.map((item) => item.id).join("/"),
+              nodeIds: [...pathNodes],
+              label: [...pathNodes.map((id2) => labels.get(id2) ?? id2), labels.get(start) ?? start].join(" \u2192 "),
+              kind: !signsKnown ? "unclassified" : negatives % 2 ? "balancing" : "reinforcing"
+            });
+            if (loops.length >= maxLoops) return;
+          } else if (link.toId >= start && !pathNodes.includes(link.toId) && pathNodes.length < maxLength) {
+            pathNodes.push(link.toId);
+            pathLinks.push(link);
+            walk(link.toId);
+            pathLinks.pop();
+            pathNodes.pop();
+          }
+        }
+      };
+      walk(start);
+      if (loops.length >= maxLoops) break;
+    }
+    return loops;
+  }
+
   // src/app/main.ts
-  var app = new l({ name: "/m:os systems canvas", version: "0.1.0" });
-  var model = structuredClone(fixture);
+  var app = new l({ name: "/m:os systems canvas", version: "0.2.0" });
+  function readSharedModel() {
+    try {
+      if (!location.hash.startsWith("#model=")) return null;
+      const encoded = location.hash.slice(7).replace(/-/g, "+").replace(/_/g, "/");
+      const binary = atob(encoded);
+      const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+      const result = validateModel(JSON.parse(new TextDecoder().decode(bytes)));
+      return result.ok ? result.model : null;
+    } catch {
+      return null;
+    }
+  }
+  function readSavedModel() {
+    try {
+      const saved = localStorage.getItem("mos.systems-map.v1");
+      if (!saved) return null;
+      const result = validateModel(JSON.parse(saved));
+      return result.ok ? result.model : null;
+    } catch {
+      return null;
+    }
+  }
+  var model = readSharedModel() ?? readSavedModel() ?? structuredClone(fixture);
   var hostConnected = false;
+  var activeTool = "select";
+  var selected = null;
+  var connectionStart = null;
+  var simValues = null;
+  var simTick = 0;
+  var playTimer = null;
+  var traceTimers = [];
+  var drag = null;
   var byId = (id2) => document.getElementById(id2);
+  var allNodes = () => [...model.stocks, ...model.variables ?? [], ...model.actors, ...model.levels];
+  var findNode = (id2) => allNodes().find((node2) => node2.id === id2);
+  var stopPlaying = () => {
+    if (playTimer !== null) window.clearInterval(playTimer);
+    playTimer = null;
+    const button = byId("play");
+    byId("play-label").textContent = "Play";
+    button.setAttribute("aria-label", "Start simulation");
+    button.querySelector("path")?.setAttribute("d", "M6 3l15 9-15 9z");
+  };
   function redraw() {
-    const svg = byId("map");
-    const diagram = renderDiagram(model);
-    svg.setAttribute("viewBox", diagram.viewBox);
-    svg.innerHTML = diagram.markup;
-    const ns = [...model.stocks, ...model.actors, ...model.levels];
-    const materialFlows = byId("material-flows");
-    materialFlows.replaceChildren(...model.flows.map((flow2) => {
-      const source = flow2.fromStockId ? model.stocks.find((stock2) => stock2.id === flow2.fromStockId)?.label ?? flow2.fromStockId : "outside";
-      const destination = flow2.toStockId ? model.stocks.find((stock2) => stock2.id === flow2.toStockId)?.label ?? flow2.toStockId : "outside";
-      const item = document.createElement("li");
-      item.textContent = `${source} flows to ${destination}: ${flow2.label}; evidence: ${flow2.evidence}; rate: ${flow2.rate ?? "unknown"} ${flow2.unit ?? ""}; delay: ${flow2.delay ?? "unknown"}.`;
-      return item;
-    }));
-    byId("flow-summary").textContent = model.flows.length ? `${model.flows.length} material flow${model.flows.length === 1 ? "" : "s"}. Arrow direction shows transfer between stocks or the system boundary.` : "No material flows are currently mapped.";
-    const rels = byId("relationships");
-    rels.replaceChildren(...model.causalLinks.map((link) => {
-      const source = ns.find((node2) => node2.id === link.fromId)?.label ?? link.fromId;
-      const destination = ns.find((node2) => node2.id === link.toId)?.label ?? link.toId;
-      const polarity = link.polarity === "positive" ? "positive influence" : link.polarity === "negative" ? "negative influence" : "unknown polarity";
-      const item = document.createElement("li");
-      item.textContent = `${source} has ${polarity} on ${destination}; evidence: ${link.evidence}; delay: ${link.delay ?? "unknown"}.`;
-      return item;
-    }));
-    byId("relationship-summary").textContent = model.causalLinks.length ? `${model.causalLinks.length} causal relationship${model.causalLinks.length === 1 ? "" : "s"}. Each entry states source, destination, polarity, evidence status, and delay.` : "No causal relationships are currently mapped.";
-    byId("json").value = JSON.stringify(model, null, 2);
+    for (const timer of traceTimers) window.clearTimeout(timer);
+    traceTimers = [];
+    try {
+      localStorage.setItem("mos.systems-map.v1", JSON.stringify(model));
+    } catch {
+    }
+    const svg2 = byId("map");
+    const displayModel = simValues ? { ...model, stocks: model.stocks.map((stock2) => ({ ...stock2, value: simValues[stock2.id] ?? stock2.value })) } : model;
+    const diagram = renderDiagram(displayModel);
+    svg2.setAttribute("viewBox", diagram.viewBox);
+    svg2.innerHTML = diagram.markup;
+    if (selected) svg2.querySelector(`[data-${selected.type === "node" ? "node" : selected.type === "flow" ? "flow" : "link"}-id="${CSS.escape(selected.id)}"]`)?.classList.add("selected");
+    byId("canvas-title").textContent = model.title || "Untitled system";
     byId("title").value = model.title;
-    byId("boundary").value = model.boundary;
     byId("purpose").value = model.purpose;
+    byId("boundary").value = model.boundary;
+    byId("json").value = JSON.stringify(model, null, 2);
+    renderInspector();
+    updateSimulationStatus();
+    renderFeedbackLoops();
   }
-  function syncFields() {
-    model.title = byId("title").value;
-    model.boundary = byId("boundary").value;
-    model.purpose = byId("purpose").value;
+  function renderFeedbackLoops() {
+    const list = byId("feedback-loops");
+    const loops = findFeedbackLoops(model);
+    list.replaceChildren();
+    byId("loop-count").textContent = loops.length ? `${loops.length}${loops.length === 32 ? "+" : ""} found` : "None mapped yet";
+    for (const loop of loops) {
+      const item = document.createElement("li");
+      const badge = document.createElement("span");
+      badge.className = `loop-badge ${loop.kind}`;
+      badge.textContent = loop.kind === "reinforcing" ? "R" : loop.kind === "balancing" ? "B" : "?";
+      badge.setAttribute("aria-label", loop.kind);
+      const label2 = document.createElement("span");
+      label2.textContent = loop.label;
+      item.append(badge, label2);
+      list.append(item);
+    }
   }
-  function readEditorModel() {
-    syncFields();
-    const result = validateModel(JSON.parse(byId("json").value));
-    if (!result.ok) throw new Error(result.issues.map((issue2) => `${issue2.path}: ${issue2.message}`).join("; "));
-    return result.model;
+  function updateSimulationStatus() {
+    const values = simValues ?? Object.fromEntries(model.stocks.map((stock2) => [stock2.id, stock2.value]));
+    const missingStocks = model.stocks.filter((stock2) => values[stock2.id] == null).length;
+    const missingRates = model.flows.filter((flow2) => flow2.rate == null).length;
+    const button = byId("step");
+    button.disabled = !model.stocks.length || missingStocks > 0 || missingRates > 0;
+    byId("sim-status").textContent = simValues ? `Step ${simTick}. Fixed rates only; influences and stated delays are not simulated.` : missingStocks || missingRates ? `To play, enter a starting value for each stock and a fixed rate for each flow (${missingStocks} values, ${missingRates} rates missing).` : "Ready. Play uses constant rates for one step at a time.";
   }
+  function field(label2, value, change, type = "text", options) {
+    const wrap = document.createElement("label");
+    wrap.textContent = label2;
+    const input2 = options ? document.createElement("select") : document.createElement("input");
+    if (options) for (const option of options) {
+      const item = document.createElement("option");
+      item.value = option;
+      item.textContent = option;
+      input2.append(item);
+    }
+    else input2.type = type;
+    input2.value = value;
+    input2.addEventListener("change", () => change(input2.value));
+    wrap.append(input2);
+    return wrap;
+  }
+  function renderInspector() {
+    const title = byId("selection-title"), detail = byId("selection-detail");
+    detail.replaceChildren();
+    if (!selected) {
+      title.textContent = "Selected item";
+      detail.innerHTML = "<p>Select a box or an arrow. Drag a box to move it.</p>";
+      return;
+    }
+    const makeField = (name, value, change, type = "text", options) => detail.append(field(name, value, (next) => {
+      change(next);
+      redraw();
+    }, type, options));
+    if (selected.type === "node") {
+      const stock2 = model.stocks.find((item) => item.id === selected.id);
+      const node2 = findNode(selected.id);
+      if (!node2) return;
+      const variable2 = model.variables?.find((item) => item.id === node2.id);
+      title.textContent = stock2 ? "Stock" : variable2 ? "Causal variable" : model.actors.some((item) => item.id === node2.id) ? "Actor" : "System level";
+      makeField("Name", node2.label, (next) => {
+        node2.label = next;
+      });
+      if (stock2) {
+        makeField("What accumulates", stock2.description ?? "", (next) => {
+          stock2.description = next || void 0;
+        });
+        makeField("Starting amount", stock2.value == null ? "" : String(stock2.value), (next) => {
+          stock2.value = next === "" ? null : Number(next);
+          simValues = null;
+        }, "number");
+        makeField("Unit", stock2.unit ?? "", (next) => {
+          stock2.unit = next || null;
+        });
+        makeField("Evidence", stock2.evidence, (next) => {
+          stock2.evidence = next;
+        }, "text", ["observed", "reported", "inferred", "hypothesis", "unknown"]);
+      } else if (variable2) {
+        makeField("What this condition means", variable2.description ?? "", (next) => {
+          variable2.description = next || void 0;
+        });
+        makeField("Current value (optional)", variable2.value == null ? "" : String(variable2.value), (next) => {
+          variable2.value = next === "" ? null : Number(next);
+        }, "number");
+        makeField("Unit", variable2.unit ?? "", (next) => {
+          variable2.unit = next || null;
+        });
+        makeField("Evidence", variable2.evidence, (next) => {
+          variable2.evidence = next;
+        }, "text", ["observed", "reported", "inferred", "hypothesis", "unknown"]);
+      } else if (node2.description !== void 0) makeField("Role in the system", node2.description ?? "", (next) => {
+        node2.description = next || void 0;
+      });
+      if (model.levels.some((level2) => level2.id === node2.id)) {
+        const level2 = model.levels.find((item) => item.id === node2.id);
+        makeField("Contained within", level2.parentId ?? "none", (next) => {
+          level2.parentId = next === "none" ? null : next;
+        }, "text", ["none", ...model.levels.filter((item) => item.id !== level2.id).map((item) => item.id)]);
+      }
+    } else if (selected.type === "flow") {
+      const flow2 = model.flows.find((item) => item.id === selected.id);
+      if (!flow2) return;
+      title.textContent = "Material flow";
+      const source = flow2.fromStockId ? model.stocks.find((item) => item.id === flow2.fromStockId)?.label ?? flow2.fromStockId : "outside this system";
+      const target = flow2.toStockId ? model.stocks.find((item) => item.id === flow2.toStockId)?.label ?? flow2.toStockId : "outside this system";
+      const route = document.createElement("p");
+      route.textContent = `${source} \u2192 ${target}`;
+      detail.append(route);
+      makeField("What moves", flow2.label, (next) => {
+        flow2.label = next;
+      });
+      makeField("Fixed rate per step", flow2.rate == null ? "" : String(flow2.rate), (next) => {
+        flow2.rate = next === "" ? null : Number(next);
+        simValues = null;
+      }, "number");
+      makeField("Rate unit", flow2.unit ?? "", (next) => {
+        flow2.unit = next || null;
+      });
+      makeField("Evidence", flow2.evidence, (next) => {
+        flow2.evidence = next;
+      }, "text", ["observed", "reported", "inferred", "hypothesis", "unknown"]);
+      makeField("Delay (description only)", flow2.delay ?? "", (next) => {
+        flow2.delay = next || null;
+      });
+    } else {
+      const link = model.causalLinks.find((item) => item.id === selected.id);
+      if (!link) return;
+      title.textContent = "Causal influence";
+      const source = findNode(link.fromId)?.label ?? link.fromId;
+      const target = findNode(link.toId)?.label ?? link.toId;
+      const route = document.createElement("p");
+      route.textContent = `${source} \u2192 ${target}`;
+      detail.append(route);
+      makeField("Claim", link.label ?? "", (next) => {
+        link.label = next || void 0;
+      });
+      makeField("Polarity", link.polarity, (next) => {
+        link.polarity = next;
+      }, "text", ["positive", "negative", "unknown"]);
+      makeField("Evidence", link.evidence, (next) => {
+        link.evidence = next;
+      }, "text", ["observed", "reported", "inferred", "hypothesis", "unknown"]);
+      makeField("Delay (description only)", link.delay ?? "", (next) => {
+        link.delay = next || null;
+      });
+    }
+  }
+  function setStatus(message, error62 = false) {
+    const status = byId("status");
+    status.textContent = message;
+    status.setAttribute("data-state", error62 ? "error" : "ready");
+  }
+  function newId(prefix) {
+    const all = new Set([...allNodes(), ...model.flows, ...model.causalLinks, ...model.assumptions, ...model.evidence].map((item) => item.id));
+    let i2 = 1;
+    while (all.has(`${prefix}-${i2}`)) i2++;
+    return `${prefix}-${i2}`;
+  }
+  function svgPoint(event) {
+    const svg2 = byId("map");
+    const point = svg2.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    const matrix = svg2.getScreenCTM();
+    return matrix ? point.matrixTransform(matrix.inverse()) : { x: 400, y: 300 };
+  }
+  function addStock(x2, y2) {
+    const id2 = newId("stock");
+    model.stocks.push({ id: id2, label: "New stock", unit: null, value: null, evidence: "unknown" });
+    model.layout.nodes[id2] = { x: Math.max(0, x2 - 110), y: Math.max(0, y2 - 47) };
+    selected = { type: "node", id: id2 };
+    redraw();
+    setStatus("Stock added. Give it a clear name and unit.");
+  }
+  function addAuxiliary(kind, x2, y2) {
+    const id2 = newId(kind);
+    if (kind === "variable") {
+      model.schemaVersion = "1.1";
+      (model.variables ??= []).push({ id: id2, label: "New variable", description: "", unit: null, value: null, evidence: "unknown" });
+    } else if (kind === "actor") model.actors.push({ id: id2, label: "New actor", description: "" });
+    else model.levels.push({ id: id2, label: "New system level", parentId: null });
+    model.layout.nodes[id2] = { x: Math.max(0, x2 - (kind === "variable" ? 110 : 95)), y: Math.max(0, y2 - (kind === "variable" ? 47 : 36)) };
+    selected = { type: "node", id: id2 };
+    redraw();
+    setStatus(`${kind === "variable" ? "Causal variable" : kind === "actor" ? "Actor" : "System level"} added. Give it a clear name.`);
+  }
+  function connectNode(id2) {
+    if (!connectionStart) {
+      connectionStart = id2;
+      selected = { type: "node", id: id2 };
+      byId("canvas-hint").textContent = "Now select the destination node.";
+      redraw();
+      return;
+    }
+    if (connectionStart === id2) {
+      connectionStart = null;
+      byId("canvas-hint").textContent = "Select a source, then a destination.";
+      return;
+    }
+    if (activeTool === "flow") {
+      if (!model.stocks.some((stock2) => stock2.id === connectionStart) || !model.stocks.some((stock2) => stock2.id === id2)) {
+        setStatus("A material flow must connect stocks. Choose two stock boxes.", true);
+        connectionStart = null;
+        return;
+      }
+      const flow2 = { id: newId("flow"), label: "New flow", fromStockId: connectionStart, toStockId: id2, unit: null, rate: null, evidence: "unknown", delay: null };
+      model.flows.push(flow2);
+      selected = { type: "flow", id: flow2.id };
+    } else {
+      const link = { id: newId("influence"), fromId: connectionStart, toId: id2, polarity: "positive", label: "Possible influence", evidence: "hypothesis", delay: null };
+      model.causalLinks.push(link);
+      selected = { type: "link", id: link.id };
+    }
+    connectionStart = null;
+    byId("canvas-hint").textContent = activeTool === "flow" ? "Select two stocks to connect a flow." : "Select two items to connect an influence.";
+    redraw();
+  }
+  function deleteSelection(id2, kind) {
+    if (kind === "flow") model.flows = model.flows.filter((item) => item.id !== id2);
+    else if (kind === "link") model.causalLinks = model.causalLinks.filter((item) => item.id !== id2);
+    else {
+      model.stocks = model.stocks.filter((item) => item.id !== id2);
+      model.variables = (model.variables ?? []).filter((item) => item.id !== id2);
+      model.actors = model.actors.filter((item) => item.id !== id2);
+      model.levels = model.levels.filter((item) => item.id !== id2);
+      model.flows = model.flows.filter((item) => item.fromStockId !== id2 && item.toStockId !== id2);
+      model.causalLinks = model.causalLinks.filter((item) => item.fromId !== id2 && item.toId !== id2);
+      delete model.layout.nodes[id2];
+    }
+    selected = null;
+    simValues = null;
+    redraw();
+    setStatus("Selected item and its connected lines removed.");
+  }
+  function selectTarget(target) {
+    const node2 = target.closest("[data-node-id]");
+    const flow2 = target.closest("[data-flow-id]");
+    const link = target.closest("[data-link-id]");
+    if (node2) selected = { type: "node", id: node2.dataset.nodeId };
+    else if (flow2) selected = { type: "flow", id: flow2.dataset.flowId };
+    else if (link) selected = { type: "link", id: link.dataset.linkId };
+    else return null;
+    return { node: node2, flow: flow2, link };
+  }
+  function onCanvasPointerDown(event) {
+    const svg2 = byId("map"), target = event.target, hit = selectTarget(target);
+    if (activeTool === "trace") {
+      if (hit?.node) traceFrom(hit.node.dataset.nodeId);
+      else setStatus("Select a variable or stock to trace its mapped influence paths.");
+      return;
+    }
+    if (activeTool === "stock" || activeTool === "variable" || activeTool === "actor" || activeTool === "level") {
+      if (hit) {
+        setStatus("Choose an empty place on the canvas.");
+        return;
+      }
+      const p2 = svgPoint(event);
+      if (activeTool === "stock") addStock(p2.x, p2.y);
+      else addAuxiliary(activeTool, p2.x, p2.y);
+      return;
+    }
+    if (activeTool === "flow" || activeTool === "influence") {
+      if (hit?.node) connectNode(hit.node.dataset.nodeId);
+      else setStatus("Select a system element on the canvas.");
+      return;
+    }
+    if (activeTool === "delete") {
+      if (hit?.node) deleteSelection(hit.node.dataset.nodeId, "node");
+      else if (hit?.flow) deleteSelection(hit.flow.dataset.flowId, "flow");
+      else if (hit?.link) deleteSelection(hit.link.dataset.linkId, "link");
+      return;
+    }
+    if (activeTool === "select" && hit?.node) {
+      const id2 = hit.node.dataset.nodeId;
+      const pos = model.layout.nodes[id2];
+      const p2 = svgPoint(event);
+      if (pos) {
+        drag = { id: id2, startX: p2.x, startY: p2.y, nodeX: pos.x, nodeY: pos.y, deltaX: 0, deltaY: 0, moved: false };
+        svg2.setPointerCapture(event.pointerId);
+      }
+      redraw();
+      event.preventDefault();
+    } else if (activeTool === "select" && hit) redraw();
+  }
+  function onCanvasPointerMove(event) {
+    if (!drag) return;
+    const p2 = svgPoint(event);
+    const dx = p2.x - drag.startX, dy = p2.y - drag.startY;
+    if (Math.abs(dx) + Math.abs(dy) > 2) drag.moved = true;
+    drag.deltaX = dx;
+    drag.deltaY = dy;
+    const node2 = svg.querySelector(`[data-node-id="${CSS.escape(drag.id)}"]`);
+    if (node2) node2.setAttribute("transform", `translate(${dx} ${dy})`);
+  }
+  function onCanvasPointerUp() {
+    if (!drag) return;
+    if (drag.moved) {
+      const layout = model.layout.nodes[drag.id];
+      layout.x += drag.deltaX;
+      layout.y += drag.deltaY;
+    }
+    drag = null;
+    redraw();
+  }
+  function traceFrom(startId) {
+    const svg2 = byId("map");
+    for (const timer of traceTimers) window.clearTimeout(timer);
+    traceTimers = [];
+    svg2.querySelectorAll(".causal").forEach((link) => link.classList.remove("trace-positive", "trace-negative", "trace-unknown"));
+    const queue = [{ id: startId, sign: "positive", path: /* @__PURE__ */ new Set([startId]) }];
+    const seen = /* @__PURE__ */ new Set();
+    const events = [];
+    while (queue.length && events.length < 48) {
+      const current = queue.shift();
+      for (const link of model.causalLinks.filter((item) => item.fromId === current.id)) {
+        if (seen.has(link.id) || current.path.has(link.toId)) continue;
+        seen.add(link.id);
+        const sign = current.sign === "unknown" || link.polarity === "unknown" ? "unknown" : current.sign === link.polarity ? "positive" : "negative";
+        events.push({ linkId: link.id, sign });
+        const path = new Set(current.path);
+        path.add(link.toId);
+        queue.push({ id: link.toId, sign, path });
+        if (events.length >= 48) break;
+      }
+    }
+    if (!events.length) {
+      setStatus("No outgoing influence links are mapped from this item.");
+      return;
+    }
+    setStatus("Tracing possible influence paths. This is qualitative; it does not simulate rates, delays, or prove causes.");
+    events.forEach((event, index) => {
+      traceTimers.push(window.setTimeout(() => {
+        const link = svg2.querySelector(`[data-link-id="${CSS.escape(event.linkId)}"]`);
+        link?.classList.add(`trace-${event.sign}`);
+        traceTimers.push(window.setTimeout(() => link?.classList.remove(`trace-${event.sign}`), 750));
+      }, index * 240));
+    });
+    traceTimers.push(window.setTimeout(() => setStatus(`Trace finished across ${events.length} mapped influence${events.length === 1 ? "" : "s"}. The result is a path exploration, not a prediction.`), events.length * 240 + 800));
+  }
+  function stepSimulation() {
+    const current = simValues ?? Object.fromEntries(model.stocks.map((stock2) => [stock2.id, stock2.value ?? 0]));
+    if (model.stocks.some((stock2) => stock2.value == null && simValues?.[stock2.id] == null) || model.flows.some((flow2) => flow2.rate == null)) {
+      updateSimulationStatus();
+      return;
+    }
+    const requested = new Map(model.flows.map((flow2) => [flow2.id, Math.max(0, flow2.rate ?? 0)]));
+    const outgoing = /* @__PURE__ */ new Map();
+    for (const flow2 of model.flows) if (flow2.fromStockId) outgoing.set(flow2.fromStockId, (outgoing.get(flow2.fromStockId) ?? 0) + requested.get(flow2.id));
+    const scale = /* @__PURE__ */ new Map();
+    for (const [id2, total] of outgoing) scale.set(id2, total > 0 ? Math.min(1, Math.max(0, current[id2] ?? 0) / total) : 1);
+    const delta = Object.fromEntries(model.stocks.map((stock2) => [stock2.id, 0]));
+    for (const flow2 of model.flows) {
+      const amount = requested.get(flow2.id) * (flow2.fromStockId ? scale.get(flow2.fromStockId) : 1);
+      if (flow2.fromStockId) delta[flow2.fromStockId] -= amount;
+      if (flow2.toStockId) delta[flow2.toStockId] += amount;
+    }
+    simValues = Object.fromEntries(model.stocks.map((stock2) => [stock2.id, Math.max(0, (current[stock2.id] ?? 0) + delta[stock2.id])]));
+    simTick++;
+    redraw();
+  }
+  function setTool(tool) {
+    activeTool = tool;
+    connectionStart = null;
+    document.querySelectorAll(".tool").forEach((button) => button.classList.toggle("active", button.id === `tool-${tool}`));
+    const hints = { select: "Select a node to inspect it. Drag to move.", stock: "Click the canvas to place a stock.", flow: "Select a source stock, then a destination stock.", influence: "Select a source, then a destination. The claim starts as a hypothesis.", trace: "Select a starting variable to trace possible influence paths. This is qualitative, not a simulation.", variable: "Click the canvas to add a condition or factor. Use influence arrows to map possible causes.", actor: "Click the canvas to place an actor.", level: "Click the canvas to place a nested system level.", delete: "Select an item to remove it." };
+    byId("canvas-hint").textContent = `${hints[tool] ?? ""}${window.matchMedia("(max-width: 850px)").matches ? " Swipe the map sideways to see more." : ""}`;
+  }
+  if (window.matchMedia("(max-width: 850px)").matches) byId("canvas-hint").textContent = "Select a node to inspect it. Swipe the map sideways to see more.";
   function downloadModel() {
     const blob = new Blob([JSON.stringify(model, null, 2)], { type: "application/json" });
     const url2 = URL.createObjectURL(blob);
@@ -25974,83 +26431,128 @@ container holding the app. Specify either width or maxWidth, and either height o
     link.click();
     URL.revokeObjectURL(url2);
   }
-  function addStock() {
-    const id2 = `stock-${model.stocks.length + 1}`;
-    model.stocks.push({ id: id2, label: `New stock ${model.stocks.length + 1}`, unit: null, value: null, evidence: "unknown" });
-    model.layout.nodes[id2] = { x: 90 + (model.stocks.length - 1) % 3 * 300, y: 300 + Math.floor((model.stocks.length - 1) / 3) * 140 };
-    redraw();
-  }
-  function addFlow() {
-    model.flows.push({ id: `flow-${model.flows.length + 1}`, label: `New material flow ${model.flows.length + 1}`, toStockId: model.stocks[0]?.id ?? null, unit: null, rate: null, evidence: "unknown", delay: null });
-    redraw();
-  }
-  function addLink() {
-    if (model.stocks.length < 2) {
-      byId("status").textContent = "Add at least two stocks/elements before adding a causal link.";
-      return;
-    }
-    model.causalLinks.push({ id: `link-${model.causalLinks.length + 1}`, fromId: model.stocks[0].id, toId: model.stocks[1].id, polarity: "unknown", evidence: "hypothesis", delay: null });
-    redraw();
+  function makeShareUrl() {
+    const bytes = new TextEncoder().encode(JSON.stringify(model));
+    let binary = "";
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    const encoded = btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    return `${location.href.split("#")[0]}#model=${encoded}`;
   }
   function receiveModel(candidate) {
-    let value = candidate;
-    if (typeof value === "string") {
+    const value = typeof candidate === "string" ? (() => {
       try {
-        value = JSON.parse(value);
+        return JSON.parse(candidate);
       } catch {
-        byId("status").textContent = "The initiating tool supplied model text that is not valid JSON.";
-        return false;
+        return null;
       }
-    }
-    if (!value || typeof value !== "object") return false;
+    })() : candidate;
     const result = validateModel(value);
     if (!result.ok) {
-      byId("status").textContent = `The initiating model needs correction: ${result.issues.map((issue2) => `${issue2.path}: ${issue2.message}`).join("; ")}`;
+      setStatus(`Model needs correction: ${result.issues.map((issue2) => `${issue2.path}: ${issue2.message}`).join("; ")}`, true);
       return false;
     }
     model = result.model;
+    selected = null;
+    simValues = null;
+    stopPlaying();
     redraw();
-    byId("status").textContent = "Loaded the model supplied by the initiating MCP tool.";
+    setStatus("Model loaded. Edit it on the canvas or in Model JSON.");
     return true;
   }
-  byId("add-stock").addEventListener("click", addStock);
-  byId("add-flow").addEventListener("click", addFlow);
-  byId("add-link").addEventListener("click", addLink);
-  byId("validate").addEventListener("click", async () => {
-    try {
-      model = readEditorModel();
-      redraw();
-      if (hostConnected) {
-        const result = await app.callServerTool({ name: "model_validate", arguments: { model: JSON.stringify(model) } });
-        byId("status").textContent = result.content?.map((x2) => x2.type === "text" ? x2.text : "").join("\n") ?? "Validation response received.";
-      } else byId("status").textContent = "Valid /m:os model. The complete model remains in this view.";
-    } catch (e) {
-      byId("status").textContent = `Check model JSON: ${String(e)}`;
-    }
+  var svg = byId("map");
+  svg.addEventListener("pointerdown", onCanvasPointerDown);
+  svg.addEventListener("pointermove", onCanvasPointerMove);
+  svg.addEventListener("pointerup", onCanvasPointerUp);
+  svg.addEventListener("pointercancel", onCanvasPointerUp);
+  byId("tool-select").addEventListener("click", () => setTool("select"));
+  byId("tool-stock").addEventListener("click", () => setTool("stock"));
+  byId("tool-flow").addEventListener("click", () => setTool("flow"));
+  byId("tool-influence").addEventListener("click", () => setTool("influence"));
+  byId("tool-trace").addEventListener("click", () => setTool("trace"));
+  byId("tool-variable").addEventListener("click", () => setTool("variable"));
+  byId("tool-actor").addEventListener("click", () => setTool("actor"));
+  byId("tool-level").addEventListener("click", () => setTool("level"));
+  byId("tool-delete").addEventListener("click", () => setTool("delete"));
+  byId("title").addEventListener("change", (event) => {
+    model.title = event.currentTarget.value;
+    redraw();
   });
-  byId("json").addEventListener("change", () => {
+  byId("purpose").addEventListener("change", (event) => {
+    model.purpose = event.currentTarget.value;
+    redraw();
+  });
+  byId("boundary").addEventListener("change", (event) => {
+    model.boundary = event.currentTarget.value;
+    redraw();
+  });
+  byId("load-example").addEventListener("click", () => receiveModel(structuredClone(fixture)));
+  byId("export").addEventListener("click", downloadModel);
+  byId("share").addEventListener("click", async () => {
+    const url2 = makeShareUrl();
+    if (url2.length > 12e3) {
+      setStatus("This map is too large for a share link. Save it as a JSON file instead.", true);
+      return;
+    }
     try {
-      if (!receiveModel(JSON.parse(byId("json").value))) byId("status").textContent = "Model JSON needs correction.";
+      await navigator.clipboard.writeText(url2);
+      setStatus("Share link copied. The model is encoded in the link; it is not uploaded.");
     } catch {
-      byId("status").textContent = "Model JSON could not be parsed.";
+      window.prompt("Copy this share link. Anyone with it can view the encoded model:", url2);
     }
   });
-  byId("export").addEventListener("click", async () => {
-    try {
-      model = readEditorModel();
-      if (hostConnected) {
-        const result = await app.callServerTool({ name: "model_update", arguments: { model: JSON.stringify(model) } });
-        if (result.isError) throw new Error(result.content?.map((x2) => x2.type === "text" ? x2.text : "").join("\n"));
-        const returned = result.structuredContent;
-        if (returned?.model) model = returned.model;
-        await app.callServerTool({ name: "model_export", arguments: { model: JSON.stringify(model), format: "json" } });
+  byId("import").addEventListener("click", () => byId("file-input").click());
+  byId("file-input").addEventListener("change", async (event) => {
+    const file2 = event.currentTarget.files?.[0];
+    if (file2) {
+      try {
+        receiveModel(JSON.parse(await file2.text()));
+      } catch {
+        setStatus("That file is not valid model JSON.", true);
       }
-      redraw();
-      downloadModel();
-      byId("status").textContent = "Downloaded the complete JSON model.";
-    } catch (e) {
-      byId("status").textContent = `Export failed: ${String(e)}`;
     }
+  });
+  byId("validate").addEventListener("click", async () => {
+    const result = validateModel(JSON.parse(byId("json").value));
+    if (!result.ok) {
+      setStatus(result.issues.map((issue2) => `${issue2.path}: ${issue2.message}`).join("; "), true);
+      return;
+    }
+    model = result.model;
+    redraw();
+    if (hostConnected) {
+      const response = await app.callServerTool({ name: "model_validate", arguments: { model: JSON.stringify(model) } });
+      setStatus(response.content?.map((item) => item.type === "text" ? item.text : "").join("\n") ?? "Model validated.");
+    } else setStatus("Model is valid.");
+  });
+  byId("json").addEventListener("change", (event) => {
+    try {
+      receiveModel(JSON.parse(event.currentTarget.value));
+    } catch {
+      setStatus("Model JSON could not be parsed.", true);
+    }
+  });
+  byId("play").addEventListener("click", () => {
+    const missingStocks = model.stocks.some((stock2) => stock2.value == null && simValues?.[stock2.id] == null), missingRates = model.flows.some((flow2) => flow2.rate == null);
+    if (missingStocks || missingRates) {
+      setStatus("Add a starting amount to each stock and a fixed rate to each flow before playing. No values will be invented.", true);
+      return;
+    }
+    if (playTimer !== null) {
+      stopPlaying();
+      return;
+    }
+    const button = byId("play");
+    byId("play-label").textContent = "Pause";
+    button.setAttribute("aria-label", "Pause simulation");
+    button.querySelector("path")?.setAttribute("d", "M6 4h4v16H6zm8 0h4v16h-4z");
+    playTimer = window.setInterval(stepSimulation, 850);
+  });
+  byId("step").addEventListener("click", stepSimulation);
+  byId("reset").addEventListener("click", () => {
+    stopPlaying();
+    simValues = null;
+    simTick = 0;
+    redraw();
   });
   redraw();
   app.ontoolinput = (params) => {
@@ -26065,9 +26567,9 @@ container holding the app. Specify either width or maxWidth, and either height o
     try {
       await app.connect(new j(window.parent, window.parent));
       hostConnected = true;
-      byId("status").textContent = "Connected to MCP Apps host. Model is held in this view and sent only when you invoke a tool.";
+      setStatus("Connected to MCP Apps host. The draft stays here unless you invoke a server tool.");
     } catch {
-      byId("status").textContent = "Standalone view. Import and export JSON stay local.";
+      setStatus("Standalone canvas. Import and export stay on this device.");
     }
   })();
 })();
