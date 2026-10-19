@@ -2,11 +2,9 @@
 
 Free, standalone system mapping through one versioned JSON model, a CLI, an MCP server, and an MCP Apps editor. Use it with any MCP-capable model host or as a command-line tool. Models stay with the caller; the server does not save or log submitted model content. No LLM provider key is required.
 
-## One-click hosted MCP
+## Hosted MCP
 
-[![Deploy `/m:os` to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/jsagir/mos-stock-flow-mcp)
-
-Deploy the free blueprint, then add the generated service URL ending in `/mcp` to an MCP client that supports remote Streamable HTTP. Render may sleep free services when idle. This is a one-time deployment to your hosting account; the project does not operate a shared hosted endpoint.
+Connect your MCP client to **https://mos-stock-flow-mcp.vercel.app/mcp**. This is the shared `/m:os` service; users do not need to deploy it. It uses stateless Streamable HTTP and does not save or log submitted model content. See the [service page](https://mos-stock-flow-mcp.vercel.app/) and [host connection guide](docs/INSTALL.md).
 
 ## One-command CLI install
 
@@ -39,5 +37,11 @@ Stocks are accumulations. Flows are material/rate changes to a stock. Causal lin
 The workflow is a **PWS-informed proposed adaptation**, not a validated PWS procedure: define boundary and purpose; map causal loops; identify stocks, flows and delays; map nested levels; then compare leverage hypotheses. Wicked problems can have disputed boundaries and no final stopping rule. A map makes claims discussable; it does not prove causation or settle disagreement. See `docs/METHOD.md`.
 
 LangTalks informed implementation quality patterns through local source/code research; no live LangTalks graph MCP was available or queried.
+
+## Deploy your own instance
+
+[![Deploy `/m:os` to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/jsagir/mos-stock-flow-mcp)
+
+The Render button is for people who want their own isolated deployment. It is optional; the shared endpoint above is ready to connect.
 
 MCP client configuration menus and MCP Apps rendering vary by host. See `docs/INSTALL.md` and `docs/DEPLOYMENT.md`.

@@ -8,6 +8,8 @@ After setup, run `mos-flow init -o example.json`, `mos-flow validate example.jso
 
 ## Hosted connector
 
-Deploy the public repository's Render blueprint with the [Render one-click deploy](https://render.com/deploy?repo=https://github.com/jsagir/mos-stock-flow-mcp). Once Render provisions the service, add its HTTPS URL ending in `/mcp` using the host's custom MCP connector flow. This creates a free deployment in your hosting account; the project does not operate a shared endpoint. Client setup screens differ, so there is no universal client-side command.
+For the shared service, add `https://mos-stock-flow-mcp.vercel.app/mcp` in your AI client's remote MCP connector settings. This service is already deployed and is free to use. You do not need to create an account with the hosting provider or deploy an instance.
+
+To operate a separate instance in your own account, use the [Render one-click deploy](https://render.com/deploy?repo=https://github.com/jsagir/mos-stock-flow-mcp). Once it is ready, connect its `/mcp` URL. Client setup screens differ, so there is no universal client-side command.
 
 For the CLI, install straight from GitHub with `npm install --global github:jsagir/mos-stock-flow-mcp`. A registry package may be added separately in a future release.
