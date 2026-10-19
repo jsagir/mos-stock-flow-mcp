@@ -32,6 +32,8 @@ mos-flow export garden.json --format svg -o garden.html
 
 `-` means stdin or stdout. `init` and export write to stdout by default; use `-o FILE` for explicit local writes. The hosted Streamable HTTP transport listens on `/mcp`; `/health` is a health check.
 
+See [`examples/repository-delivery.html`](examples/repository-delivery.html) for a stock-and-flow map of this repository's own validation, hosted deployment, and npm release path. Its assumptions and evidence are recorded in the accompanying JSON.
+
 Stocks are accumulations. Flows are material/rate changes to a stock. Causal links represent influence hypotheses and remain a separate type. Each claim is `observed`, `reported`, `inferred`, `hypothesis`, or `unknown`. Missing quantities stay null/unknown. The included community garden example is synthetic.
 
 The workflow is a **PWS-informed proposed adaptation**, not a validated PWS procedure: define boundary and purpose; map causal loops; identify stocks, flows and delays; map nested levels; then compare leverage hypotheses. Wicked problems can have disputed boundaries and no final stopping rule. A map makes claims discussable; it does not prove causation or settle disagreement. See `docs/METHOD.md`.

@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "1.0",
+  "id": "mos-repository-delivery",
+  "title": "How this repository reaches users",
+  "boundary": "The /m:os source repository, its build and validation steps, the hosted MCP deployment, and npm distribution.",
+  "purpose": "Show how code changes become validated changes and then usable releases; distinguish the working hosted service from the npm registry placeholder.",
+  "timeHorizon": "Current delivery path; counts and rates are unknown unless noted.",
+  "actors": [
+    { "id": "maintainers", "label": "Maintainers", "description": "Maintain the source, run validation, and respond to release blockers." }
+  ],
+  "levels": [],
+  "stocks": [
+    { "id": "main-changes", "label": "Changes awaiting checks", "unit": "change sets", "value": null, "evidence": "unknown" },
+    { "id": "validated-changes", "label": "Validated changes", "unit": "change sets", "value": 0, "evidence": "observed" },
+    { "id": "hosted-capabilities", "label": "Hosted MCP capabilities", "unit": "capabilities", "value": null, "evidence": "unknown" },
+    { "id": "npm-releases", "label": "Functional npm releases", "unit": "packages", "value": 0, "evidence": "observed" }
+  ],
+  "flows": [
+    { "id": "merge", "label": "Changes merged", "toStockId": "main-changes", "unit": "change sets", "rate": null, "evidence": "reported", "delay": null },
+    { "id": "checks", "label": "Checks pass", "fromStockId": "main-changes", "toStockId": "validated-changes", "unit": "change sets", "rate": null, "evidence": "observed", "delay": null },
+    { "id": "deployment", "label": "Deploy to hosted MCP", "fromStockId": "validated-changes", "toStockId": "hosted-capabilities", "unit": "change sets", "rate": null, "evidence": "observed", "delay": "Deployment follows a successful push to main." },
+    { "id": "npm-publish", "label": "Publish working npm package", "fromStockId": "validated-changes", "toStockId": "npm-releases", "unit": "packages", "rate": 0, "evidence": "observed", "delay": "The registry currently exposes a staged placeholder instead of the executable package." }
+  ],
+  "causalLinks": [
+    { "id": "queue-attention", "fromId": "main-changes", "toId": "maintainers", "polarity": "positive", "label": "A larger unchecked queue requires more maintainer attention", "evidence": "hypothesis", "delay": null }
+  ],
+  "assumptions": [
+    { "id": "release-unit", "text": "A change set is used as a conceptual unit for movement through validation and deployment; production capability counts are not available.", "status": "hypothesis" }
+  ],
+  "evidence": [
+    { "id": "current-checks", "text": "The repository typecheck, build, CLI/MCP/deployment smoke checks, and documentation check pass for the current main commit.", "status": "observed" },
+    { "id": "hosted-check", "text": "The shared hosted MCP responds successfully and serves the current stock-and-flow App resource.", "status": "observed" },
+    { "id": "npm-placeholder", "text": "The npm scope currently exposes only 0.0.0-stage, without the executable package contents.", "status": "observed" }
+  ],
+  "layout": {
+    "nodes": {
+      "main-changes": { "x": 180, "y": 180 },
+      "validated-changes": { "x": 530, "y": 180 },
+      "hosted-capabilities": { "x": 890, "y": 180 },
+      "npm-releases": { "x": 530, "y": 430 },
+      "maintainers": { "x": 180, "y": 430 }
+    }
+  },
+  "metadata": {
+    "snapshotDate": "2026-10-19",
+    "sourceRepository": "https://github.com/jsagir/mos-stock-flow-mcp"
+  }
+}

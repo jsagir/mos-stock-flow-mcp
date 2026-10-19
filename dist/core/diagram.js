@@ -21,23 +21,70 @@ export function renderDiagram(model) {
     const flows = model.flows.map((f, i) => {
         const from = f.fromStockId ? p(f.fromStockId) : null, to = f.toStockId ? p(f.toStockId) : null;
         const fromSize = f.fromStockId ? size(f.fromStockId) : null, toSize = f.toStockId ? size(f.toStockId) : null;
-        const y1 = from ? from.y + fromSize.h / 2 : (to?.y ?? 100) + 30 + (i % 3) * 16;
-        const y2 = to ? to.y + toSize.h / 2 : y1;
+        const portY = (id) => {
+            const related = model.flows.filter(flow => flow.fromStockId === id || flow.toStockId === id);
+            const rank = related.findIndex(flow => flow.id === f.id);
+            const offset = related.length < 2 ? 0 : -30 + 60 * rank / (related.length - 1);
+            return p(id).y + size(id).h / 2 + offset;
+        };
         const rightward = !from || !to || to.x >= from.x;
-        const sx = from ? from.x + (rightward ? fromSize.w : 0) : (to?.x ?? 260) - 140;
-        const ex = to ? to.x + (rightward ? 0 : toSize.w) : (from?.x ?? 100) + fromSize.w + 140;
-        const d = `M${sx},${y1} H${(sx + ex) / 2} V${y2} H${ex}`;
+        const vertical = Boolean(from && to && Math.abs(to.y - from.y) > Math.abs(to.x - from.x));
+        let sx, sy, ex, ey, routeX, routeY, d, labelX, labelY, labelAnchor;
+        if (vertical && from && to) {
+            const down = to.y >= from.y;
+            sx = from.x + fromSize.w / 2;
+            ex = to.x + toSize.w / 2;
+            sy = down ? from.y + fromSize.h : from.y;
+            ey = down ? to.y : to.y + toSize.h;
+            routeY = (sy + ey) / 2;
+            routeX = (sx + ex) / 2;
+            d = `M${sx},${sy} V${routeY} H${ex} V${ey}`;
+            labelX = Math.max(sx, ex) + 18;
+            labelY = routeY - 5;
+            labelAnchor = "start";
+        }
+        else {
+            sy = from ? portY(f.fromStockId) : to ? portY(f.toStockId) : 100;
+            ey = to ? portY(f.toStockId) : sy;
+            sx = from ? from.x + (rightward ? fromSize.w : 0) : (to?.x ?? 260) - 140;
+            ex = to ? to.x + (rightward ? 0 : toSize.w) : (from?.x ?? 100) + fromSize.w + 140;
+            routeX = (sx + ex) / 2;
+            routeY = sy;
+            d = `M${sx},${sy} H${routeX} V${ey} H${ex}`;
+            labelX = routeX;
+            labelY = Math.min(sy, ey) - 16;
+            labelAnchor = "middle";
+        }
         if (!from)
-            clouds.add(`M${sx - 35},${y1} c-18,-16 8,-33 23,-24 c9,-24 42,-12 38,7 c22,3 17,28 -2,28 h-44 c-10,0 -17,-5 -15,-11 Z`);
+            clouds.add(`M${sx - 35},${sy} c-18,-16 8,-33 23,-24 c9,-24 42,-12 38,7 c22,3 17,28 -2,28 h-44 c-10,0 -17,-5 -15,-11 Z`);
         if (!to)
-            clouds.add(`M${ex - 18},${y2} c-18,-16 8,-33 23,-24 c9,-24 42,-12 38,7 c22,3 17,28 -2,28 h-44 c-10,0 -17,-5 -15,-11 Z`);
-        const mid = (sx + ex) / 2;
-        return `<g class="flow ${evidenceClass(f.evidence)}"><path d="${d}" class="pipe-under"/><path d="${d}" class="pipe" marker-end="url(#flow-arrow)"/><circle class="valve" cx="${mid}" cy="${y1}" r="12"/><path class="valve-mark" d="M${mid - 7},${y1 - 7} L${mid},${y1} L${mid - 7},${y1 + 7} M${mid + 7},${y1 - 7} L${mid},${y1} L${mid + 7},${y1 + 7}"/><text class="flow-label" x="${mid}" y="${Math.min(y1, y2) - 16}" text-anchor="middle">${esc(f.label)}${f.rate != null ? ` · ${esc(String(f.rate))}` : ""}${f.unit ? ` ${esc(f.unit)}` : ""}</text></g>`;
+            clouds.add(`M${ex - 18},${ey} c-18,-16 8,-33 23,-24 c9,-24 42,-12 38,7 c22,3 17,28 -2,28 h-44 c-10,0 -17,-5 -15,-11 Z`);
+        const words = `${f.label}${f.rate != null ? ` · ${f.rate}${f.unit ? ` ${f.unit}` : ""}` : ""}`.split(/\s+/);
+        const maxChars = Math.max(9, Math.floor(((vertical ? maxX - Math.max(sx, ex) - 40 : Math.abs(ex - sx)) - 20) / 7));
+        const rows = [];
+        let row = "";
+        for (const word of words) {
+            if (row && row.length + word.length + 1 > maxChars) {
+                rows.push(row);
+                row = word;
+            }
+            else
+                row += `${row ? " " : ""}${word}`;
+        }
+        if (row)
+            rows.push(row);
+        const label = `<text class="flow-label" x="${labelX}" y="${labelY - (rows.length - 1) * 13}" text-anchor="${labelAnchor}">${rows.map((line, j) => `<tspan x="${labelX}" dy="${j ? 13 : 0}">${esc(line)}</tspan>`).join("")}</text>`;
+        return `<g class="flow ${evidenceClass(f.evidence)}"><path d="${d}" class="pipe-under"/><path d="${d}" class="pipe" marker-end="url(#flow-arrow)"/><circle class="valve" cx="${routeX}" cy="${routeY}" r="12"/><path class="valve-mark" d="M${routeX - 7},${routeY - 7} L${routeX},${routeY} L${routeX - 7},${routeY + 7} M${routeX + 7},${routeY - 7} L${routeX},${routeY} L${routeX + 7},${routeY + 7}"/>${label}</g>`;
     }).join("");
     const links = model.causalLinks.map(link => {
         const a = p(link.fromId), b = p(link.toId), as = size(link.fromId), bs = size(link.toId);
-        const x1 = a.x + as.w / 2, y1 = a.y, x2 = b.x + bs.w / 2, y2 = b.y;
-        const lift = Math.max(48, Math.abs(x2 - x1) * 0.18), mx = (x1 + x2) / 2, my = Math.min(y1, y2) - lift;
+        const acx = a.x + as.w / 2, acy = a.y + as.h / 2, bcx = b.x + bs.w / 2, bcy = b.y + bs.h / 2;
+        const vertical = Math.abs(bcy - acy) > Math.abs(bcx - acx);
+        const x1 = vertical ? acx : acx + (bcx >= acx ? as.w / 2 : -as.w / 2);
+        const y1 = vertical ? acy + (bcy >= acy ? as.h / 2 : -as.h / 2) : acy;
+        const x2 = vertical ? bcx : bcx + (bcx >= acx ? -bs.w / 2 : bs.w / 2);
+        const y2 = vertical ? bcy + (bcy >= acy ? -bs.h / 2 : bs.h / 2) : bcy;
+        const mx = (x1 + x2) / 2, my = vertical ? (y1 + y2) / 2 : Math.min(y1, y2) - Math.max(48, Math.abs(x2 - x1) * 0.18);
         const pol = link.polarity === "positive" ? "+" : link.polarity === "negative" ? "−" : "?";
         return `<g class="causal ${evidenceClass(link.evidence)}"><path d="M${x1},${y1} Q${mx},${my} ${x2},${y2}" marker-end="url(#causal-arrow)"/><circle cx="${mx}" cy="${my}" r="12" class="polarity-badge"/><text x="${mx}" y="${my + 5}" text-anchor="middle" class="polarity">${pol}</text>${link.label ? `<text x="${mx}" y="${my - 15}" text-anchor="middle" class="link-label">${esc(link.label)}</text>` : ""}</g>`;
     }).join("");
