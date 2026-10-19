@@ -4,7 +4,7 @@
 
 Download or clone the project, open its directory, and run `./install.sh`. It requires Node.js 20+ and npm, installs pinned dependencies, builds, links `mos-flow`, and writes `.mcp.json`. Review that file and copy its `mcpServers.mos-systems` entry into your MCP client settings. The script does not edit client settings because paths and config formats differ.
 
-After setup, run `mos-flow init -o example.json`, `mos-flow validate example.json`, or `mos-flow export example.json --format svg -o example.html`. For local MCP use `node /absolute/path/to/dist/server/stdio.js`. Text and structured JSON work in non-App clients; App rendering requires MCP Apps support.
+After setup, run `mos-flow app` to start the local-first SystemicWorks editor, or use `mos-flow init -o example.json`, `mos-flow validate example.json`, and `mos-flow export example.json --format svg -o example.html`. For local MCP use `node /absolute/path/to/dist/server/stdio.js`. The bundled editor renders in hosts that support MCP Apps.
 
 ## Hosted connector
 
@@ -20,6 +20,6 @@ Install both the CLI and local stdio MCP launcher:
 npm install --global https://codeload.github.com/jsagir/mos-stock-flow-mcp/tar.gz/refs/heads/main
 ```
 
-This installs the committed prebuilt files without running a local TypeScript build. Use `mos-flow` for CLI commands and `mos-mcp` as the command for a local MCP server configuration. The hosted service above requires no npm install.
+This installs the committed prebuilt files without running a local TypeScript build. Use `mos-flow app` for the local editor, other `mos-flow` commands for model work, and `mos-mcp` for a local stdio MCP server configuration. The hosted service above requires no npm install.
 
-The npm registry entry is still a placeholder and does not contain the executable package. Use the GitHub archive command above until a real registry release is available.
+The npm registry currently serves version `0.2.0`; the SystemicWorks replacement in this checkout has not been released to npm yet. From this checkout, run `npm ci && npm run build`, then `node dist/cli.js app`. The global npm install will include this editor after the next package release.

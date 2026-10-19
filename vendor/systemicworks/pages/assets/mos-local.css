@@ -1,0 +1,55 @@
+:root {
+  --mos-ink: #17191c;
+  --mos-paper: #f5f4ef;
+  --mos-white: #fff;
+  --mos-line: #d8d8d2;
+  --mos-blue: #243fbe;
+  --mos-muted: #62656c;
+  --mos-lime: #dff36a;
+}
+html, body, .app-container, .app { width: 100%; height: 100%; min-height: 100%; }
+body { margin: 0; overflow: hidden; color: var(--mos-ink); background: var(--mos-paper); font: 14px/1.4 "DM Sans", "Figtree", system-ui, sans-serif; }
+.app { border: 0; filter: none; background: var(--mos-paper); }
+#bar { min-height: 54px; justify-content: flex-start; gap: 12px; padding: 6px 12px; background: var(--mos-white); box-shadow: 0 1px 0 var(--mos-line); }
+.logo { width: auto; height: 28px; object-fit: contain; }
+.mos-logo { max-width: 72px; }
+.mos-wordmark { display: inline-flex; align-items: center; width: auto; color: var(--mos-blue); font: 800 19px/1 Figtree, system-ui, sans-serif; letter-spacing: -.05em; }
+#toolbar { flex: 1; justify-content: flex-start; gap: 3px; }
+.toolbar_button { width: 42px; height: 42px; border-radius: 7px; }
+.toolbar_button[selected=yes] { background-color: #e8eaff; outline: 1px solid #b9c2ff; }
+.toolbar_button:hover { background-color: #f0f0f5; }
+.toolbar_separator { width: 1px; height: 26px; margin: 0 5px; background: var(--mos-line); }
+#playbar { margin: 0; padding-left: 12px; border-left: 1px solid var(--mos-line); }
+#playbar button, #sidebar button, #unhide-button { min-height: 36px; border: 1px solid var(--mos-line); border-radius: 7px; background: var(--mos-white); color: var(--mos-ink); font: inherit; cursor: pointer; }
+#playbar button { padding: 0 12px; }
+#local-save-status { margin-left: auto; color: var(--mos-muted); font-size: 12px; white-space: nowrap; }
+#canvasses { min-height: 0; flex: 1; background-color: var(--mos-paper); background-image: radial-gradient(#c5c7cd 0.75px, transparent 0.75px); background-size: 20px 20px; }
+#canvasses canvas { touch-action: none; }
+#sidebar { border-left: 1px solid var(--mos-line); background: var(--mos-white); box-shadow: -10px 0 28px #151b2b0d; }
+#sidebar h2, #sidebar h3 { color: var(--mos-ink); font-family: inherit; }
+#sidebar p, #sidebar label, #sidebar input, #sidebar textarea, #sidebar button { font-family: inherit; }
+#sidebar input, #sidebar textarea { max-width: 100%; border: 1px solid var(--mos-line); border-radius: 5px; padding: 7px; }
+#hide-button { padding: 7px; }
+#hide-button > div { width: 30px; height: 30px; border-radius: 6px; background: var(--mos-paper); }
+#hide-button p { color: var(--mos-ink); font: 600 16px/30px inherit; text-align: center; }
+#unhide-button { top: 68px; left: 12px; width: auto; padding: 0 12px; color: var(--mos-ink); }
+@media (max-width: 720px) {
+  #bar { gap: 5px; padding: 5px; }
+  .logo { height: 23px; }
+  .mos-logo { max-width: 54px; }
+  .toolbar_button { width: 36px; height: 36px; padding: 5px; }
+  #local-save-status { font-size: 10px; }
+  #playbar { padding-left: 5px; }
+}
+#mos-mcp-badge { padding: 6px 9px; border-radius: 999px; background: #e8eaff; color: var(--mos-blue); font-size: 10px; font-weight: 700; letter-spacing: .08em; white-space: nowrap; }
+.mos-model-panel { padding: 20px 18px 28px; overflow-y: auto; max-height: calc(100vh - 60px); color: var(--mos-ink); }
+.mos-model-panel h2 { margin: 2px 0 9px; font-size: 22px; line-height: 1.18; }
+.mos-model-panel h3 { margin: 18px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--mos-muted); }
+.mos-model-panel p { margin: 9px 0; font-size: 13px; line-height: 1.5; }
+.mos-model-panel ul { margin: 0; padding-left: 19px; }
+.mos-model-panel li { margin: 7px 0; font-size: 13px; line-height: 1.4; }
+.mos-model-panel .mos-map-legend { margin: 15px 0; padding: 12px; border-radius: 7px; background: #f2f2fa; color: #434659; }
+.mos-model-actions { margin-top: 20px; }
+.mos-model-actions { display: grid; gap: 8px; }
+.mos-model-actions button { width: 100%; padding: 9px 12px; border: 1px solid var(--mos-blue); border-radius: 7px; background: var(--mos-white); color: var(--mos-blue); font: 600 13px inherit; cursor: pointer; }
+.mos-model-actions button:last-child { background: var(--mos-blue); color: #fff; }

@@ -16,7 +16,7 @@ describe("shared /m:os contract across CLI, MCP and App", () => {
     try {
       const listed = await client.listTools();
       const create = listed.tools.find(tool => tool.name === "model_create");
-      expect(create?._meta?.ui).toMatchObject({ resourceUri: "ui://mos/stock-flow/editor.html" });
+      expect(create?._meta?.ui).toMatchObject({ resourceUri: "ui://mos/systemicworks/editor.html" });
       const created = await client.callTool({ name: "model_create", arguments: { model: serializeModel(fixture) } });
       expect(created.isError).not.toBe(true);
       expect(created.structuredContent).toMatchObject({ model: { id: fixture.id, title: fixture.title } });
@@ -29,8 +29,8 @@ describe("shared /m:os contract across CLI, MCP and App", () => {
       const exported = await client.callTool({ name: "model_export", arguments: { model: serializeModel(changed), format: "svg" } });
       expect(exported.content?.some(item => item.type === "text" && item.text.includes("A caller-supplied replacement"))).toBe(true);
 
-      const app = await client.readResource({ uri: "ui://mos/stock-flow/editor.html" });
-      expect(app.contents.some(item => item.uri === "ui://mos/stock-flow/editor.html" && item.mimeType === "text/html;profile=mcp-app")).toBe(true);
+      const app = await client.readResource({ uri: "ui://mos/systemicworks/editor.html" });
+      expect(app.contents.some(item => item.uri === "ui://mos/systemicworks/editor.html" && item.mimeType === "text/html;profile=mcp-app")).toBe(true);
       expect(app.contents[0]?.text.length).toBeLessThan(4_000_000);
       expect(renderSvg(changed)).toContain("A caller-supplied replacement");
     } finally {

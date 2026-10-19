@@ -1,6 +1,6 @@
-# `/m:os` stock and flow mapper
+# `/m:os` systems mapping
 
-Free, standalone system mapping through one versioned JSON model, a CLI, an MCP server, and an MCP Apps editor. Use it with any MCP-capable model host or as a command-line tool. Models stay with the caller; the server does not save or log submitted model content. No LLM provider key is required.
+Free systems mapping for practitioners and students: a local-first SystemicWorks visual editor, a CLI, and an MCP server. The visual editor is based on [SystemicWorks](https://github.com/JuanCSUCoder/SystemicWorks) and its causal-loop diagramming canvas. The `/m:os` data model and CLI also describe stocks, material flows, causal variables, evidence, and feedback loops. No LLM provider key is required.
 
 ## Hosted MCP
 
@@ -15,13 +15,23 @@ npm install --global @jsagir/mos-stock-flow-mcp
 mos-flow init -o garden.json
 ```
 
-The package includes the prebuilt canvas, CLI, and MCP server, so users do not need TypeScript or a local build toolchain. For a local MCP client, set its server command to `mos-mcp`. To install from a source checkout, run `./install.sh`.
+The package includes the prebuilt visual editor, CLI, and MCP server, so users do not need TypeScript or a local build toolchain. For a local MCP client, set its server command to `mos-mcp`.
+
+The npm registry currently serves version `0.2.0`; this checkout's SystemicWorks replacement is newer and has not been released to npm. From this checkout, build with `npm ci && npm run build`, then run `node dist/cli.js app`. The npm install command will pick up this editor after the next package release.
+
+Run the visual editor entirely on your computer:
+
+```sh
+mos-flow app
+```
+
+Open the printed `127.0.0.1` URL. Projects autosave to that browser's IndexedDB using RxDB and its free Dexie adapter. The app does not require an account or remote database. Stop the local server with Ctrl+C.
 
 ## Local MCP setup
 
 From a downloaded or cloned project directory, run `./install.sh`. It installs pinned dependencies, builds, links `mos-flow`, and writes `.mcp.json` with the local stdio MCP command. Add that entry to a client that supports local MCP servers. The installer does not rewrite client settings.
 
-## Quick start
+## CLI quick start
 
 ```sh
 mos-flow init -o garden.json
@@ -36,13 +46,15 @@ See [`examples/repository-delivery.html`](examples/repository-delivery.html) for
 
 Stocks are accumulations. Flows are material/rate changes to a stock. Causal variables represent non-accumulating conditions; dashed influence links connect variables, stocks, actors, and system levels. The model format accepts existing schema `1.0` files and writes schema `1.1` when causal variables are added. Short feedback cycles are identified from the mapped links and labeled reinforcing (R), balancing (B), or unknown from their polarities. The scan is bounded for large, dense maps. These labels describe the diagram's logic, not verified real-world effects. Each claim is `observed`, `reported`, `inferred`, `hypothesis`, or `unknown`; missing quantities stay null/unknown.
 
-The canvas autosaves a draft to the local browser when storage is available. **Save as file** exports portable model JSON. **Copy share link** encodes the current model in the URL fragment; it does not upload the model, but anyone with the link can read its contents. The hosted MCP itself is stateless and does not store submitted model content.
+The visual project and its canonical `/m:os` model save to the browser's local IndexedDB database through RxDB and the free Dexie storage adapter. No account, sync service, or remote database is required. MCP hosts can restrict storage inside embedded Apps; if that happens, **Save `/m:os` JSON** and open it in the direct localhost editor using **Open `/m:os` JSON**. The hosted MCP itself is stateless and does not store submitted model content. Cross-device replication is not enabled.
 
-On the canvas, choose **Variable** to add a condition such as garden quality, **Influence** to connect a possible cause to an effect, and **Stock** plus **Flow** for amounts and the rates that change them. Click an item to edit its meaning and evidence. Add `+` when the conditions tend to move in the same direction, `−` when they tend to move in opposite directions, and `?` when direction is unclear. The feedback loop list updates from these links. **Trace** steps through reachable influence links and highlights the accumulated direction of their signs. This is qualitative path exploration; it does not calculate outcomes or simulate delays.
+The original SystemicWorks drawing tools focus on causal-loop diagrams. When an MCP tool supplies a `/m:os` model, the replacement canvas renders stock accumulations as boxes, material flows as blue pipes with valve marks, and causal influences with polarity signs; the side panel preserves rates, evidence, actors, levels, assumptions, and feedback loops. This structural map does not calculate stock levels over time. Direct manual creation/editing of stock and flow types and numerical simulation remain future extensions; the `/m:os` CLI and MCP model tools already validate and export the full model.
 
 The workflow is a **PWS-informed proposed adaptation**, not a validated PWS procedure: define boundary and purpose; map causal loops; identify stocks, flows and delays; map nested levels; then compare leverage hypotheses. Wicked problems can have disputed boundaries and no final stopping rule. A map makes claims discussable; it does not prove causation or settle disagreement. See `docs/METHOD.md`.
 
 LangTalks informed implementation quality patterns through local source/code research; no live LangTalks graph MCP was available or queried.
+
+SystemicWorks is distributed under GPL-3.0. Its upstream license and source attribution are retained in [`vendor/systemicworks`](vendor/systemicworks) and [`NOTICE.md`](NOTICE.md). The `/m:os` additions include the local RxDB workspace, packaged CLI launch, and MCP resource integration.
 
 ## Deploy your own instance
 

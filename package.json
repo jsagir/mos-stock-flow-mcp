@@ -1,18 +1,24 @@
 {
   "name": "@jsagir/mos-stock-flow-mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": false,
   "description": "Free `/m:os` stock-and-flow modeling over MCP and CLI",
-  "license": "MIT",
+  "license": "GPL-3.0-only",
   "type": "module",
   "bin": {
     "mos-flow": "dist/cli.js",
     "mos-mcp": "dist/mcp.js"
   },
   "files": [
-    "dist/**",
+    "dist/cli.js",
+    "dist/mcp.js",
+    "dist/cli/**",
+    "dist/core/**",
+    "dist/server/**",
+    "dist/app/systemicworks/**",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "NOTICE.md"
   ],
   "repository": {
     "type": "git",
@@ -35,7 +41,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "build": "tsc && node scripts/copy-app.mjs",
+    "build": "tsc && node scripts/copy-app.mjs && node scripts/build-systemicworks.mjs",
     "start": "node dist/server/http.js",
     "mcp:stdio": "node dist/server/stdio.js",
     "smoke:cli": "node scripts/smoke-cli.mjs",
@@ -53,6 +59,8 @@
   "devDependencies": {
     "@types/node": "24.10.1",
     "esbuild": "0.25.12",
+    "rxdb": "^17.5.0",
+    "rxjs": "^7.8.2",
     "typescript": "5.9.3",
     "vitest": "3.2.7"
   },

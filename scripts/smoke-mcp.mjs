@@ -6,6 +6,9 @@ const client = new Client({ name: "mos-smoke", version: "0.1.0" }, { capabilitie
 await client.connect(transport);
 const tools = await client.listTools(); const required = ["model_create", "model_update", "model_validate", "model_get", "model_export"];
 for (const name of required) if (!tools.tools.some(t => t.name === name)) throw new Error(`Missing MCP tool ${name}`);
+const resource = await client.readResource({ uri: "ui://mos/systemicworks/editor.html" });
+const app = resource.contents.find(item => item.mimeType === "text/html;profile=mcp-app")?.text ?? "";
+if (!app.includes("/m:os · SystemicWorks local editor") || !app.includes("Saved on this device") || /googletagmanager|fonts\.googleapis/.test(app)) throw new Error("SystemicWorks MCP App resource is not self-contained or local-first");
 const model = JSON.parse((await import("../dist/core/fixture.js")).fixture ? JSON.stringify((await import("../dist/core/fixture.js")).fixture) : "{}");
 const res = await client.callTool({ name: "model_validate", arguments: { model: JSON.stringify(model) } });
 if (res.isError || !JSON.stringify(res).includes("Valid")) throw new Error(JSON.stringify(res));
