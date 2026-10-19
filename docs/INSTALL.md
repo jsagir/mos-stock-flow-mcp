@@ -17,9 +17,9 @@ To operate a separate instance in your own account, use the [Render one-click de
 Install both the CLI and local stdio MCP launcher:
 
 ```sh
-npm install --global github:jsagir/mos-stock-flow-mcp
+npm install --global https://codeload.github.com/jsagir/mos-stock-flow-mcp/tar.gz/refs/heads/main
 ```
 
 This installs the committed prebuilt files without running a local TypeScript build. Use `mos-flow` for CLI commands and `mos-mcp` as the command for a local MCP server configuration. The hosted service above requires no npm install.
 
-The npm registry entry is still a placeholder and does not contain the executable package. Use the GitHub install command above until a real registry release is available.
+The npm registry entry is still a placeholder and does not contain the executable package. Use the GitHub archive command above until a real registry release is available.

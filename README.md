@@ -11,7 +11,7 @@ Connect your MCP client to **https://mos-stock-flow-mcp.vercel.app/mcp**. This i
 Install directly from GitHub with npm:
 
 ```sh
-npm install --global github:jsagir/mos-stock-flow-mcp
+npm install --global https://codeload.github.com/jsagir/mos-stock-flow-mcp/tar.gz/refs/heads/main
 mos-flow init -o garden.json
 ```
 
