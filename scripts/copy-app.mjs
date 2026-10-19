@@ -16,9 +16,9 @@ const b64 = async path => (await import("node:fs/promises")).readFile(path).then
 const font = async (file, mime) => `url(data:${mime};base64,${await b64(`src/app/assets/fonts/${file}`)})`;
 const fonts = [
   `@font-face{font-family:Figtree;src:${await font("Figtree-variable.woff2", "font/woff2")};font-weight:100 900;font-display:swap}`,
-  `@font-face{font-family:DM Sans;src:${await font("DM-Sans-variable.ttf", "font/ttf")};font-weight:100 900;font-display:swap}`,
+  `@font-face{font-family:"DM Sans";src:${await font("DM-Sans-variable.ttf", "font/ttf")};font-weight:100 900;font-display:swap}`,
   `@font-face{font-family:Heebo;src:${await font("Heebo-variable.ttf", "font/ttf")};font-weight:100 900;font-display:swap}`,
-  `@font-face{font-family:JetBrains Mono;src:${await font("JetBrains-Mono-variable.ttf", "font/ttf")};font-weight:100 900;font-display:swap}`,
+  `@font-face{font-family:"JetBrains Mono";src:${await font("JetBrains-Mono-variable.ttf", "font/ttf")};font-weight:100 900;font-display:swap}`,
 ].join("");
 const lockup = `data:image/svg+xml;base64,${await b64("src/app/assets/mos-lockup-transparent-v2.svg")}`;
-await writeFile("dist/app/index.html", template.replace("__MOS_FONTS__", fonts).replace("__MOS_CSS__", css).replace("__PARENT_LOCKUP__", lockup).replace("__MOS_SCRIPT__", app.replace(/<\/script/gi, "<\\/script")));
+await writeFile("dist/app/index.html", template.replace("__MOS_FONTS__", fonts).replace("__MOS_CSS__", css).replace("__PARENT_LOCKUP__", lockup).replace("__MOS_SCRIPT__", () => app.replace(/<\/script/gi, "<\\/script")));

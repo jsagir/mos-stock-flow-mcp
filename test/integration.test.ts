@@ -31,6 +31,7 @@ describe("shared /m:os contract across CLI, MCP and App", () => {
 
       const app = await client.readResource({ uri: "ui://mos/stock-flow/editor.html" });
       expect(app.contents.some(item => item.uri === "ui://mos/stock-flow/editor.html" && item.mimeType === "text/html;profile=mcp-app")).toBe(true);
+      expect(app.contents[0]?.text.length).toBeLessThan(4_000_000);
       expect(renderSvg(changed)).toContain("A caller-supplied replacement");
     } finally {
       await client.close();

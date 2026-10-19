@@ -16,4 +16,4 @@ const fonts = [
   `@font-face{font-family:"JetBrains Mono";src:${asData(join(assetPath, "fonts/JetBrains-Mono-variable.ttf"), "font/ttf")};font-weight:100 900;font-display:swap}`,
 ].join("");
 const lockup = `data:image/svg+xml;base64,${readFileSync(join(assetPath, "mos-lockup-transparent-v2.svg")).toString("base64")}`;
-export const appHtml = html.replace("__MOS_FONTS__", fonts).replace("__MOS_CSS__", css).replace("__PARENT_LOCKUP__", lockup).replace("__MOS_SCRIPT__", bundle.replace(/<\/script/gi, "<\\/script"));
+export const appHtml = html.replace("__MOS_FONTS__", fonts).replace("__MOS_CSS__", css).replace("__PARENT_LOCKUP__", lockup).replace("__MOS_SCRIPT__", () => bundle.replace(/<\/script/gi, "<\\/script"));
